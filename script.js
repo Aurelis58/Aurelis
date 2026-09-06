@@ -154,6 +154,217 @@ function resetAutoplay() {
 window.moveSlide = moveSlide;
 window.goToSlide = goToSlide;
  
+/* ---------------- order forms (crochet / ribbon) ---------------- */
+function formatMoney(amount, symbol) {
+  return `${symbol}${amount.toFixed(2)}`;
+}
+ 
+function renderOrderPage(pageKey, pageData, site) {
+  const symbol = site.currencySymbol || 'QAR';
+  const itemsEl = document.querySelector('[data-list="order-items"]');
+  if (!itemsEl) return;
+ 
+  itemsEl.innerHTML = pageData.products.map((p, i) => `
+    <div class="order-item" data-price="${p.price}" data-index="${i}">
+      <div>
+        <span class="order-item-name">${p.name}</span>
+        <span class="order-item-unit">${formatMoney(p.price, symbol)} per ${p.unit}</span>
+      </div>
+      <div class="order-item-price" data-role="line-total">${formatMoney(0, symbol)}</div>
+      <div class="qty-control">
+        <button type="button" class="qty-btn" data-action="minus" aria-label="Decrease quantity">-</button>
+        <input class="qty-input" type="number" min="0" step="1" value="0" data-role="qty" aria-label="Quantity for ${p.name}">
+        <button type="button" class="qty-btn" data-action="plus" aria-label="Increase quantity">+</button>
+      </div>
+    </div>
+  `).join('');
+ 
+  const deliveryFee = pageData.deliveryFee || 0;
+  const deliveryFeeEls = document.querySelectorAll('[data-role="delivery-fee"]');
+  deliveryFeeEls.forEach(el => el.textContent = formatMoney(deliveryFee, symbol));
+ 
+  function recalculate() {
+    let subtotal = 0;
+    itemsEl.querySelectorAll('.order-item').forEach(row => {
+      const price = parseFloat(row.getAttribute('data-price'));
+      const qtyInput = row.querySelector('[data-role="qty"]');
+      let qty = parseInt(qtyInput.value, 10);
+      if (isNaN(qty) || qty < 0) qty = 0;
+      qtyInput.value = qty;
+      const lineTotal = price * qty;
+      row.querySelector('[data-role="line-total"]').textContent = formatMoney(lineTotal, symbol);
+      subtotal += lineTotal;
+    });
+    const hasItems = subtotal > 0;
+    const total = hasItems ? subtotal + deliveryFee : 0;
+ 
+    document.querySelectorAll('[data-role="subtotal"]').forEach(el => el.textContent = formatMoney(subtotal, symbol));
+    document.querySelectorAll('[data-role="grand-total"]').forEach(el => el.textContent = formatMoney(total, symbol));
+    return { subtotal, deliveryFee, total, hasItems };
+  }
+ 
+  itemsEl.addEventListener('click', e => {
+    const btn = e.target.closest('.qty-btn');
+    if (!btn) return;
+    const row = btn.closest('.order-item');
+    const input = row.querySelector('[data-role="qty"]');
+    let qty = parseInt(input.value, 10) || 0;
+    qty = btn.getAttribute('data-action') === 'plus' ? qty + 1 : Math.max(0, qty - 1);
+    input.value = qty;
+    recalculate();
+  });
+  itemsEl.addEventListener('input', e => {
+    if (e.target.matches('[data-role="qty"]')) recalculate();
+  });
+ 
+  recalculate();
+ 
+  const form = document.getElementById('order-form');
+  if (!form) return;
+ 
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+ 
+    const nameField = document.getElementById('cust-name');
+    const phoneField = document.getElementById('cust-phone');
+    const addressField = document.getElementById('cust-address');
+    const emailField = document.getElementById('cust-email');
+    const notesField = document.getElementById('cust-notes');
+    const fields = [nameField, phoneField, addressField];
+    let valid = true;
+ 
+    fields.forEach(f => {
+      const wrapper = f.closest('.form-field');
+      if (!f.value.trim()) {
+        wrapper.classList.add('invalid');
+        valid = false;
+      } else {
+        wrapper.classList.remove('invalid');
+      }
+    });
+ 
+    const totals = recalculate();
+    const msgEl = document.getElementById('form-msg');
+ 
+    if (!totals.hasItems) {
+      msgEl.textContent = 'Please choose at least one item before submitting your order.';
+      msgEl.className = 'form-msg error show';
+      valid = false;
+    }
+ 
+    if (!valid) {
+      if (totals.hasItems) {
+        msgEl.textContent = 'Please fill in your name, phone number and delivery address.';
+        msgEl.className = 'form-msg error show';
+      }
+      return;
+    }
+    msgEl.className = 'form-msg';
+ 
+    const orderedItems = [];
+    itemsEl.querySelectorAll('.order-item').forEach(row => {
+      const idx = parseInt(row.getAttribute('data-index'), 10);
+      const qty = parseInt(row.querySelector('[data-role="qty"]').value, 10) || 0;
+      if (qty > 0) {
+        const product = pageData.products[idx];
+        orderedItems.push({ name: product.name, unit: product.unit, price: product.price, qty, lineTotal: product.price * qty });
+      }
+    });
+ 
+    const orderId = 'ORD-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '-' + Date.now().toString().slice(-4);
+    const orderDate = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+ 
+    const customer = {
+      name: nameField.value.trim(),
+      phone: phoneField.value.trim(),
+      address: addressField.value.trim(),
+      email: emailField ? emailField.value.trim() : '',
+      notes: notesField ? notesField.value.trim() : ''
+    };
+ 
+    sendOrderEmail(pageData, site, orderId, orderDate, customer, orderedItems, totals);
+    showReceipt(pageData, site, orderId, orderDate, customer, orderedItems, totals);
+  });
+}
+ 
+function sendOrderEmail(pageData, site, orderId, orderDate, customer, items, totals) {
+  const symbol = site.currencySymbol || '$';
+  const lines = [];
+  lines.push(`New order: ${orderId}`);
+  lines.push(`Date: ${orderDate}`);
+  lines.push('');
+  lines.push('Customer details');
+  lines.push(`Name: ${customer.name}`);
+  lines.push(`Phone: ${customer.phone}`);
+  lines.push(`Delivery address: ${customer.address}`);
+  if (customer.email) lines.push(`Email: ${customer.email}`);
+  if (customer.notes) lines.push(`Notes: ${customer.notes}`);
+  lines.push('');
+  lines.push('Items');
+  items.forEach(it => {
+    lines.push(`${it.qty} x ${it.name} (${formatMoney(it.price, symbol)} per ${it.unit}) = ${formatMoney(it.lineTotal, symbol)}`);
+  });
+  lines.push('');
+  lines.push(`Subtotal: ${formatMoney(totals.subtotal, symbol)}`);
+  lines.push(`Delivery fee: ${formatMoney(totals.deliveryFee, symbol)}`);
+  lines.push(`Total due on delivery: ${formatMoney(totals.total, symbol)}`);
+  lines.push('');
+  lines.push('Payment method: Cash on delivery');
+ 
+  const subject = encodeURIComponent(`${pageData.heading} - ${orderId}`);
+  const body = encodeURIComponent(lines.join('\n'));
+  const mailtoUrl = `mailto:${site.orderEmail}?subject=${subject}&body=${body}`;
+ 
+  const link = document.createElement('a');
+  link.href = mailtoUrl;
+  link.click();
+}
+ 
+function showReceipt(pageData, site, orderId, orderDate, customer, items, totals) {
+  const symbol = site.currencySymbol || '$';
+  const wrap = document.getElementById('receipt-wrap');
+  const formSection = document.querySelector('.order-form-section');
+  if (!wrap) return;
+ 
+  document.getElementById('receipt-order-id').textContent = orderId;
+  document.getElementById('receipt-order-date').textContent = orderDate;
+  document.getElementById('receipt-cust-name').textContent = customer.name;
+  document.getElementById('receipt-cust-phone').textContent = customer.phone;
+  document.getElementById('receipt-cust-address').textContent = customer.address;
+ 
+  const emailRow = document.getElementById('receipt-cust-email-row');
+  if (customer.email) {
+    document.getElementById('receipt-cust-email').textContent = customer.email;
+    emailRow.style.display = '';
+  } else {
+    emailRow.style.display = 'none';
+  }
+ 
+  const notesRow = document.getElementById('receipt-cust-notes-row');
+  if (customer.notes) {
+    document.getElementById('receipt-cust-notes').textContent = customer.notes;
+    notesRow.style.display = '';
+  } else {
+    notesRow.style.display = 'none';
+  }
+ 
+  const linesEl = document.getElementById('receipt-lines');
+  linesEl.innerHTML = items.map(it => `
+    <div class="receipt-line">
+      <span>${it.qty} x ${it.name} (${it.unit})</span>
+      <span>${formatMoney(it.lineTotal, symbol)}</span>
+    </div>
+  `).join('');
+ 
+  document.getElementById('receipt-subtotal').textContent = formatMoney(totals.subtotal, symbol);
+  document.getElementById('receipt-delivery').textContent = formatMoney(totals.deliveryFee, symbol);
+  document.getElementById('receipt-total').textContent = formatMoney(totals.total, symbol);
+ 
+  if (formSection) formSection.style.display = 'none';
+  wrap.classList.add('show');
+  wrap.scrollIntoView({ behavior: 'auto' });
+}
+ 
 /* ---------------- boot ---------------- */
 document.addEventListener('DOMContentLoaded', () => {
   fetch('content.json')
@@ -179,6 +390,16 @@ document.addEventListener('DOMContentLoaded', () => {
       if (page === 'terms' && data.legalPages) {
         bindText(document, { legal: data.legalPages.termsConditions });
         renderLegalSections(data.legalPages.termsConditions);
+      }
+      if (page === 'order-crochet' && data.orderPages) {
+        document.title = data.orderPages.crochet.pageTitle;
+        bindText(document, { order: data.orderPages.crochet });
+        renderOrderPage('crochet', data.orderPages.crochet, data.site);
+      }
+      if (page === 'order-ribbon' && data.orderPages) {
+        document.title = data.orderPages.ribbon.pageTitle;
+        bindText(document, { order: data.orderPages.ribbon });
+        renderOrderPage('ribbon', data.orderPages.ribbon, data.site);
       }
  
       if (document.getElementById('slides')) {

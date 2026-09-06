@@ -3,15 +3,16 @@
     "brandName": "Aurelis",
     "pageTitle": "Aurelis | Handmade Crochet, Ribbon and Craft",
     "footerTagline": "Handmade crochet, ribbon and paper craft, made in small batches and shipped with care.",
-    "copyrightText": "2026 Aurelis. All rights reserved."
+    "copyrightText": "2026 Aurelis. All rights reserved.",
+    "orderEmail": "aurelis2058@gmail.com",
+    "currencySymbol": "QAR "
   },
 
   "nav": {
     "links": [
-      { "label": "Shop", "href": "#shop" },
-      { "label": "Crochet", "href": "#crochet" },
-      { "label": "Ribbons", "href": "#ribbons" },
-      { "label": "Wall Art", "href": "#wallart" },
+      { "label": "Shop", "href": "index.html" },
+      { "label": "Crochet", "href": "order-crochet.html" },
+      { "label": "Ribbons", "href": "order-ribbon.html" },
       { "label": "About", "href": "#about" }
     ]
   },
@@ -23,7 +24,7 @@
         "heading": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         "body": "Duis ornare, mauris sed rutrum hendrerit, magna quam euismod sapien, nec finibus nulla lorem at enim.",
         "ctaText": "Shop Crochet",
-        "ctaHref": "#crochet",
+        "ctaHref": "order-crochet.html",
         "image": "images/hero-crochet.jpg",
         "imageAlt": "Handmade crochet bags and wearables"
       },
@@ -32,8 +33,8 @@
         "heading": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         "body": "Duis ornare, mauris sed rutrum hendrerit, magna quam euismod sapien, nec finibus nulla lorem at enim.",
         "ctaText": "Shop Ribbon",
-        "ctaHref": "#ribbons",
-        "image": "images/hero-ribbon.jpg",
+        "ctaHref": "order-ribbon.html",
+        "image": "assets/images/mini-bouquet-samples.jpg",
         "imageAlt": "Assorted ribbon rolls"
       },
       {
@@ -56,42 +57,73 @@
   ],
 
   "categoriesSection": {
-    "eyebrow": "Explore",
+    "eyebrow": "Order",
     "heading": "Shop by Category"
   },
   "categories": [
     { "name": "Crochet", "icon": "crochet", "href": "#crochet" },
     { "name": "Ribbons", "icon": "ribbon", "href": "#ribbons" },
-    { "name": "Wall Art", "icon": "wallart", "href": "#wallart" },
-    { "name": "Gift Sets", "icon": "giftsets", "href": "#giftsets" },
-    { "name": "Baby and Kids", "icon": "babykids", "href": "#babykids" }
+    { "name": "Gift Sets", "icon": "giftsets", "href": "#giftsets" }
   ],
 
   "productsSection": {
     "eyebrow": "From the Shop",
-    "heading": "Recently Added"
+    "heading": "Currently Available"
   },
   "products": [
-    { "tag": "", "category": "Product", "name": "Item Name", "price": "38.00", "image": "images/product-tote.jpg", "imageAlt": "Product Image" },
-    { "tag": "", "category": "Product", "name": "Item Name", "price": "44.00", "image": "images/product-hoop.jpg", "imageAlt": "Product Image" },
-    { "tag": "", "category": "Product", "name": "Item Name", "price": "9.50", "image": "images/product-ribbon.jpg", "imageAlt": "Product Image" },
-    { "tag": "", "category": "Product", "name": "Item Name", "price": "18.00", "image": "images/product-coaster.jpg", "imageAlt": "Product Image" }
+    {
+      "tag": "",
+      "category": "Ribbons",
+      "name": "Mini Bouquet Keychain",
+      "price": "TBA",
+      "image": "assets/images/mini-bouquet-samples.jpg",
+      "imageAlt": "Mini Bouquet Keychain"
+    },
+    {
+      "tag": "",
+      "category": "TBA",
+      "name": "TBA",
+      "price": "TBA",
+      "image": "images/product-hoop.jpg",
+      "imageAlt": "TBA"
+    },
+    {
+      "tag": "",
+      "category": "TBA",
+      "name": "TBA",
+      "price": "TBA",
+      "image": "images/product-ribbon.jpg",
+      "imageAlt": "TBA"
+    },
+    {
+      "tag": "",
+      "category": "TBA",
+      "name": "TBA",
+      "price": "TBA",
+      "image": "images/product-coaster.jpg",
+      "imageAlt": "TBA"
+    }
   ],
 
-  "promo": {
-    "eyebrow": "Wholesale",
-    "heading": "Buying for a Shop or Event?",
-    "body": "We offer wholesale pricing for boutiques, planners and stylists ordering 20 units or more per style.",
-    "ctaText": "Ask About Wholesale",
-    "ctaHref": "#contact"
-  },
-
-  "newsletter": {
-    "eyebrow": "Newsletter",
-    "heading": "Hear About New Drops First",
-    "body": "One email a week at most. Unsubscribe any time.",
-    "placeholder": "you@email.com",
-    "ctaText": "Subscribe"
+  "orderPages": {
+    "crochet": {
+      "pageTitle": "Order Crochet Items | Aurelis",
+      "heading": "Order Crochet Items",
+      "intro": "Choose your items and quantities below, then add your delivery details. Payment is cash on delivery. We will confirm your order and an estimated delivery date by phone before it ships.",
+      "deliveryFee": 0,
+      "products": [
+        { "name": "TBA", "unit": "each", "price": 1.00 }
+      ]
+    },
+    "ribbon": {
+      "pageTitle": "Order Ribbon | Aurelis",
+      "heading": "Order Ribbon",
+      "intro": "Choose your ribbon type and the number of yards, then add your delivery details. Payment is cash on delivery. We will confirm your order and an estimated delivery date by phone before it ships.",
+      "deliveryFee": 0,
+      "products": [
+        { "name": "Mini Bouquet Keychain", "unit": "each", "price": 3.50 }
+      ]
+    }
   },
 
   "footer": {
@@ -99,10 +131,12 @@
       {
         "heading": "Shop",
         "links": [
-          { "label": "Crochet", "href": "#crochet" },
-          { "label": "Ribbons", "href": "#ribbons" },
-          { "label": "Wall Art", "href": "#wallart" },
-          { "label": "Gift Sets", "href": "#giftsets" }
+          { "label": "Crochet", "href": "index.html#crochet" },
+          { "label": "Ribbons", "href": "index.html#ribbons" },
+          { "label": "Wall Art", "href": "index.html#wallart" },
+          { "label": "Gift Sets", "href": "index.html#giftsets" },
+          { "label": "Order Crochet", "href": "order-crochet.html" },
+          { "label": "Order Ribbon", "href": "order-ribbon.html" }
         ]
       },
       {
@@ -117,8 +151,8 @@
       {
         "heading": "Studio",
         "links": [
-          { "label": "Our Story", "href": "#about" },
-          { "label": "Custom Orders", "href": "#custom" },
+          { "label": "Our Story", "href": "index.html#about" },
+          { "label": "Custom Orders", "href": "index.html#custom" },
           { "label": "Wholesale", "href": "#contact" }
         ]
       }
