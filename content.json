@@ -1,0 +1,232 @@
+{
+  "site": {
+    "brandName": "Aurelis",
+    "pageTitle": "Aurelis | Handmade Crochet, Ribbon and Craft",
+    "footerTagline": "Handmade crochet, ribbon and paper craft, made in small batches and shipped with care.",
+    "copyrightText": "2026 Aurelis. All rights reserved."
+  },
+
+  "nav": {
+    "links": [
+      { "label": "Shop", "href": "#shop" },
+      { "label": "Crochet", "href": "#crochet" },
+      { "label": "Ribbons", "href": "#ribbons" },
+      { "label": "Wall Art", "href": "#wallart" },
+      { "label": "About", "href": "#about" }
+    ]
+  },
+
+  "hero": {
+    "slides": [
+      {
+        "eyebrow": "Crochet Collection",
+        "heading": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        "body": "Duis ornare, mauris sed rutrum hendrerit, magna quam euismod sapien, nec finibus nulla lorem at enim.",
+        "ctaText": "Shop Crochet",
+        "ctaHref": "#crochet",
+        "image": "images/hero-crochet.jpg",
+        "imageAlt": "Handmade crochet bags and wearables"
+      },
+      {
+        "eyebrow": "Ribbon Bar",
+        "heading": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        "body": "Duis ornare, mauris sed rutrum hendrerit, magna quam euismod sapien, nec finibus nulla lorem at enim.",
+        "ctaText": "Shop Ribbon",
+        "ctaHref": "#ribbons",
+        "image": "images/hero-ribbon.jpg",
+        "imageAlt": "Assorted ribbon rolls"
+      },
+      {
+        "eyebrow": "Custom Orders",
+        "heading": "Made to Your Size, Color and Budget",
+        "body": "Duis ornare, mauris sed rutrum hendrerit, magna quam euismod sapien, nec finibus nulla lorem at enim.",
+        "ctaText": "Request a Custom Quote",
+        "ctaHref": "#custom",
+        "image": "images/hero-custom.jpg",
+        "imageAlt": "Custom made to order craft piece"
+      }
+    ]
+  },
+
+  "trust": [
+    { "title": "Handmade", "detail": "Every piece made by hand to order" },
+    { "title": "Shipping", "detail": "Lorem ipsum" },
+    { "title": "Custom colors", "detail": "Choose your own yarn and ribbon colors" },
+    { "title": "Secure checkout", "detail": "Cash on Delivery" }
+  ],
+
+  "categoriesSection": {
+    "eyebrow": "Explore",
+    "heading": "Shop by Category"
+  },
+  "categories": [
+    { "name": "Crochet", "icon": "crochet", "href": "#crochet" },
+    { "name": "Ribbons", "icon": "ribbon", "href": "#ribbons" },
+    { "name": "Wall Art", "icon": "wallart", "href": "#wallart" },
+    { "name": "Gift Sets", "icon": "giftsets", "href": "#giftsets" },
+    { "name": "Baby and Kids", "icon": "babykids", "href": "#babykids" }
+  ],
+
+  "productsSection": {
+    "eyebrow": "From the Shop",
+    "heading": "Recently Added"
+  },
+  "products": [
+    { "tag": "", "category": "Product", "name": "Item Name", "price": "38.00", "image": "images/product-tote.jpg", "imageAlt": "Product Image" },
+    { "tag": "", "category": "Product", "name": "Item Name", "price": "44.00", "image": "images/product-hoop.jpg", "imageAlt": "Product Image" },
+    { "tag": "", "category": "Product", "name": "Item Name", "price": "9.50", "image": "images/product-ribbon.jpg", "imageAlt": "Product Image" },
+    { "tag": "", "category": "Product", "name": "Item Name", "price": "18.00", "image": "images/product-coaster.jpg", "imageAlt": "Product Image" }
+  ],
+
+  "promo": {
+    "eyebrow": "Wholesale",
+    "heading": "Buying for a Shop or Event?",
+    "body": "We offer wholesale pricing for boutiques, planners and stylists ordering 20 units or more per style.",
+    "ctaText": "Ask About Wholesale",
+    "ctaHref": "#contact"
+  },
+
+  "newsletter": {
+    "eyebrow": "Newsletter",
+    "heading": "Hear About New Drops First",
+    "body": "One email a week at most. Unsubscribe any time.",
+    "placeholder": "you@email.com",
+    "ctaText": "Subscribe"
+  },
+
+  "footer": {
+    "columns": [
+      {
+        "heading": "Shop",
+        "links": [
+          { "label": "Crochet", "href": "#crochet" },
+          { "label": "Ribbons", "href": "#ribbons" },
+          { "label": "Wall Art", "href": "#wallart" },
+          { "label": "Gift Sets", "href": "#giftsets" }
+        ]
+      },
+      {
+        "heading": "Support",
+        "links": [
+          { "label": "Contact Us", "href": "#contact" },
+          { "label": "Shipping", "href": "#shipping" },
+          { "label": "Returns", "href": "#returns" },
+          { "label": "Care Guide", "href": "#care" }
+        ]
+      },
+      {
+        "heading": "Studio",
+        "links": [
+          { "label": "Our Story", "href": "#about" },
+          { "label": "Custom Orders", "href": "#custom" },
+          { "label": "Wholesale", "href": "#contact" }
+        ]
+      }
+    ],
+    "legalLinks": [
+      { "label": "Privacy Policy", "href": "privacy-policy.html" },
+      { "label": "Terms and Conditions", "href": "terms-and-conditions.html" }
+    ]
+  },
+
+  "legalPages": {
+    "privacyPolicy": {
+      "title": "Privacy Policy | Aurelis",
+      "heading": "Privacy Policy",
+      "effectiveDate": "Effective date: [Month Day, Year]",
+      "sections": [
+        {
+          "heading": "Overview",
+          "body": "This page describes how Aurelis collects, uses and protects the personal information of people who visit this website or place an order with us."
+        },
+        {
+          "heading": "Information We Collect",
+          "body": "When you place an order or contact us, we may collect your name, email address, shipping address, phone number and order details. Payment card details are collected and processed directly by our third party payment processor and are not stored on our servers. We may also collect basic browser and device information through cookies and analytics tools."
+        },
+        {
+          "heading": "How We Use Your Information",
+          "body": "We use the information we collect to process and ship your order, respond to customer service requests, send order updates, send marketing emails if you have opted in, and improve the content and performance of this website."
+        },
+        {
+          "heading": "Cookies",
+          "body": "This website uses cookies to keep items in your shopping cart and to understand how visitors use the site. You can disable cookies through your browser settings, though some parts of the site may not function correctly without them."
+        },
+        {
+          "heading": "Sharing Your Information",
+          "body": "We share order information with shipping carriers and payment processors only to the extent necessary to fulfil and process your order. We do not sell your personal information to third parties."
+        },
+        {
+          "heading": "Data Retention",
+          "body": "We retain order and customer records for as long as needed to meet accounting, tax and legal obligations."
+        },
+        {
+          "heading": "Your Rights",
+          "body": "You may request access to, correction of, or deletion of the personal information we hold about you by contacting us at [contact email]."
+        },
+        {
+          "heading": "Children's Privacy",
+          "body": "This website is not directed at children under the age of 13, and we do not knowingly collect personal information from children."
+        },
+        {
+          "heading": "Changes to This Policy",
+          "body": "We may update this policy from time to time. Any changes will be posted on this page with a new effective date."
+        },
+        {
+          "heading": "Contact Us",
+          "body": "If you have questions about this policy, please contact us at [contact email]."
+        }
+      ]
+    },
+    "termsConditions": {
+      "title": "Terms and Conditions | Aurelis",
+      "heading": "Terms and Conditions",
+      "effectiveDate": "Effective date: [Month Day, Year]",
+      "sections": [
+        {
+          "heading": "Overview",
+          "body": "These terms govern your use of this website and any purchase you make from Aurelis. By placing an order, you agree to the terms described on this page."
+        },
+        {
+          "heading": "Products and Availability",
+          "body": "Because our items are handmade, small variations in color, size and texture may occur between the product photos and the item you receive. Product availability may change without notice."
+        },
+        {
+          "heading": "Custom Orders",
+          "body": "Custom and made to order items are final sale unless the item arrives defective or damaged. Production timelines are estimates and are not guaranteed."
+        },
+        {
+          "heading": "Pricing and Payment",
+          "body": "All prices are listed in [currency]. Payment is due in full at the time of ordering. We reserve the right to correct any pricing errors shown on the site."
+        },
+        {
+          "heading": "Shipping",
+          "body": "Estimated shipping timelines and costs are shown at checkout. Once an order has been handed to the shipping carrier, Aurelis is not responsible for delays caused by the carrier."
+        },
+        {
+          "heading": "Returns and Exchanges",
+          "body": "Please see our Returns page for details on which items are eligible for return or exchange. Custom and made to order items are not eligible for return unless defective."
+        },
+        {
+          "heading": "Intellectual Property",
+          "body": "All designs, photographs, illustrations and written content on this website are the property of Aurelis and may not be copied or reused without written permission."
+        },
+        {
+          "heading": "Limitation of Liability",
+          "body": "This website and its products are provided as is. Aurelis is not liable for any indirect or incidental damages arising from the use of this site or its products, beyond the purchase price paid."
+        },
+        {
+          "heading": "Governing Law",
+          "body": "These terms are governed by the laws of [State or Country]."
+        },
+        {
+          "heading": "Changes to These Terms",
+          "body": "We may update these terms from time to time. Continued use of this website after changes are posted means you accept the updated terms."
+        },
+        {
+          "heading": "Contact Us",
+          "body": "If you have questions about these terms, please contact us at [contact email]."
+        }
+      ]
+    }
+  }
+}
