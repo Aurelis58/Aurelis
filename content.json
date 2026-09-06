@@ -61,9 +61,8 @@
     "heading": "Shop by Category"
   },
   "categories": [
-    { "name": "Crochet", "icon": "crochet", "href": "#crochet" },
-    { "name": "Ribbons", "icon": "ribbon", "href": "#ribbons" },
-    { "name": "Gift Sets", "icon": "giftsets", "href": "#giftsets" }
+    { "name": "Crochet", "icon": "crochet", "href": "order-crochet.html" },
+    { "name": "Ribbons", "icon": "ribbon", "href": "order-ribbon.html" }
   ],
 
   "productsSection": {
@@ -75,25 +74,25 @@
       "tag": "",
       "category": "Ribbons",
       "name": "Mini Bouquet Keychain",
-      "price": "TBA",
+      "price": "QAR 15.00",
       "image": "assets/images/mini-bouquet-samples.jpg",
       "imageAlt": "Mini Bouquet Keychain"
     },
     {
       "tag": "",
-      "category": "TBA",
-      "name": "TBA",
-      "price": "TBA",
+      "category": "Crochet",
+      "name": "Butterfly",
+      "price": "QAR 15.00",
       "image": "images/product-hoop.jpg",
-      "imageAlt": "TBA"
+      "imageAlt": "Butterfly"
     },
     {
       "tag": "",
-      "category": "TBA",
-      "name": "TBA",
-      "price": "TBA",
+      "category": "Crochet",
+      "name": "Heart with Ribbon",
+      "price": "QAR 12.00",
       "image": "images/product-ribbon.jpg",
-      "imageAlt": "TBA"
+      "imageAlt": "Heart with Ribbon"
     },
     {
       "tag": "",
@@ -112,7 +111,8 @@
       "intro": "Choose your items and quantities below, then add your delivery details. Payment is cash on delivery. We will confirm your order and an estimated delivery date by phone before it ships.",
       "deliveryFee": 0,
       "products": [
-        { "name": "TBA", "unit": "each", "price": 1.00 }
+        { "name": "Butterfly", "unit": "each", "price": 15.00 },
+        { "name": "Heart w/ Ribbon", "unit": "each", "price": 12.00}
       ]
     },
     "ribbon": {
@@ -121,7 +121,7 @@
       "intro": "Choose your ribbon type and the number of yards, then add your delivery details. Payment is cash on delivery. We will confirm your order and an estimated delivery date by phone before it ships.",
       "deliveryFee": 0,
       "products": [
-        { "name": "Mini Bouquet Keychain", "unit": "each", "price": 3.50 }
+        { "name": "Mini Bouquet Keychain", "unit": "each", "price": 15.00 }
       ]
     }
   },

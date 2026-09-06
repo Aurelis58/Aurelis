@@ -158,7 +158,7 @@ section{padding:90px 0;}
  
 /* =================== CATEGORIES =================== */
 .categories{background:var(--cream);}
-.cat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:28px;}
+.cat-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:28px;}
 .cat-card{text-align:center; cursor:pointer;}
 .cat-circle{
   width:130px; height:130px; border-radius:50%; margin:0 auto 18px;
@@ -339,7 +339,7 @@ footer{background:var(--midnight); border-top:1px solid rgba(255,247,230,0.12); 
 }
  
 @media(max-width:1024px){
-  .cat-grid{grid-template-columns:repeat(3,1fr);}
+  .cat-grid{grid-template-columns:repeat(2,1fr);}
   .product-grid{grid-template-columns:repeat(2,1fr);}
   .foot-grid{grid-template-columns:1fr 1fr;}
   nav.links{display:none;}
