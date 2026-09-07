@@ -5,7 +5,13 @@
     "footerTagline": "Handmade crochet, ribbon and paper craft, made in small batches and shipped with care.",
     "copyrightText": "2026 Aurelis. All rights reserved.",
     "orderEmail": "aurelis2058@gmail.com",
-    "currencySymbol": "QAR "
+    "currencySymbol": "QAR ",
+    "emailjs": {
+      "publicKey": "SjV3GcuCJz2S6CtEI",
+      "serviceId": "service_k6szdn9",
+      "clientTemplateId": "template_v3a4v9k",
+      "customerTemplateId": "template_ru0o8xl"
+    }
   },
 
   "nav": {
@@ -13,7 +19,7 @@
       { "label": "Shop", "href": "index.html" },
       { "label": "Crochet", "href": "order-crochet.html" },
       { "label": "Ribbons", "href": "order-ribbon.html" },
-      { "label": "About", "href": "#about" }
+      { "label": "Letter", "href": "#about" }
     ]
   },
 
@@ -34,7 +40,7 @@
         "body": "Duis ornare, mauris sed rutrum hendrerit, magna quam euismod sapien, nec finibus nulla lorem at enim.",
         "ctaText": "Shop Ribbon",
         "ctaHref": "order-ribbon.html",
-        "image": "assets/images/mini-bouquet-samples.jpg",
+        "image": "/assets/images/mini-bouquet-samples.JPG",
         "imageAlt": "Assorted ribbon rolls"
       },
       {
@@ -62,7 +68,8 @@
   },
   "categories": [
     { "name": "Crochet", "icon": "crochet", "href": "order-crochet.html" },
-    { "name": "Ribbons", "icon": "ribbon", "href": "order-ribbon.html" }
+    { "name": "Ribbons", "icon": "ribbon", "href": "order-ribbon.html" },
+    { "name": "Letters", "icon": "", "href": "index.html"}
   ],
 
   "productsSection": {
@@ -75,7 +82,7 @@
       "category": "Ribbons",
       "name": "Mini Bouquet Keychain",
       "price": "QAR 15.00",
-      "image": "assets/images/mini-bouquet-samples.jpg",
+      "image": "/assets/images/mini-bouquet-samples.JPG",
       "imageAlt": "Mini Bouquet Keychain"
     },
     {

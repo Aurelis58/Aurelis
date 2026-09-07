@@ -160,7 +160,7 @@ function formatMoney(amount, symbol) {
 }
  
 function renderOrderPage(pageKey, pageData, site) {
-  const symbol = site.currencySymbol || 'QAR';
+  const symbol = site.currencySymbol || '$';
   const itemsEl = document.querySelector('[data-list="order-items"]');
   if (!itemsEl) return;
  
@@ -282,42 +282,147 @@ function renderOrderPage(pageKey, pageData, site) {
       notes: notesField ? notesField.value.trim() : ''
     };
  
-    sendOrderEmail(pageData, site, orderId, orderDate, customer, orderedItems, totals);
+    sendOrderEmails(pageData, site, orderId, orderDate, customer, orderedItems, totals);
     showReceipt(pageData, site, orderId, orderDate, customer, orderedItems, totals);
   });
 }
  
-function sendOrderEmail(pageData, site, orderId, orderDate, customer, items, totals) {
+function buildReceiptPdf(site, orderId, orderDate, customer, items, totals) {
+  if (!window.jspdf) return null;
+  const { jsPDF } = window.jspdf;
   const symbol = site.currencySymbol || '$';
-  const lines = [];
-  lines.push(`New order: ${orderId}`);
-  lines.push(`Date: ${orderDate}`);
-  lines.push('');
-  lines.push('Customer details');
-  lines.push(`Name: ${customer.name}`);
-  lines.push(`Phone: ${customer.phone}`);
-  lines.push(`Delivery address: ${customer.address}`);
-  if (customer.email) lines.push(`Email: ${customer.email}`);
-  if (customer.notes) lines.push(`Notes: ${customer.notes}`);
-  lines.push('');
-  lines.push('Items');
-  items.forEach(it => {
-    lines.push(`${it.qty} x ${it.name} (${formatMoney(it.price, symbol)} per ${it.unit}) = ${formatMoney(it.lineTotal, symbol)}`);
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const left = 40;
+  const right = 555;
+  let y = 50;
+ 
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.text(site.brandName || 'Order Receipt', left, y);
+  y += 20;
+ 
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.text(`Order ${orderId}`, left, y);
+  doc.text(orderDate, right, y, { align: 'right' });
+  y += 28;
+ 
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('Delivery To', left, y);
+  y += 16;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  [customer.name, customer.phone, customer.address].forEach(line => {
+    doc.text(line, left, y);
+    y += 14;
   });
-  lines.push('');
-  lines.push(`Subtotal: ${formatMoney(totals.subtotal, symbol)}`);
-  lines.push(`Delivery fee: ${formatMoney(totals.deliveryFee, symbol)}`);
-  lines.push(`Total due on delivery: ${formatMoney(totals.total, symbol)}`);
-  lines.push('');
-  lines.push('Payment method: Cash on delivery');
+  if (customer.email) { doc.text(`Email: ${customer.email}`, left, y); y += 14; }
+  if (customer.notes) { doc.text(`Notes: ${customer.notes}`, left, y); y += 14; }
+  y += 14;
  
-  const subject = encodeURIComponent(`${pageData.heading} - ${orderId}`);
-  const body = encodeURIComponent(lines.join('\n'));
-  const mailtoUrl = `mailto:${site.orderEmail}?subject=${subject}&body=${body}`;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text('Items', left, y);
+  y += 16;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  items.forEach(it => {
+    doc.text(`${it.qty} x ${it.name} (${it.unit})`, left, y);
+    doc.text(formatMoney(it.lineTotal, symbol), right, y, { align: 'right' });
+    y += 14;
+  });
  
-  const link = document.createElement('a');
-  link.href = mailtoUrl;
-  link.click();
+  y += 6;
+  doc.setDrawColor(180, 106, 114);
+  doc.line(left, y, right, y);
+  y += 18;
+ 
+  doc.setFontSize(10);
+  doc.text('Subtotal', left, y);
+  doc.text(formatMoney(totals.subtotal, symbol), right, y, { align: 'right' });
+  y += 14;
+  doc.text('Delivery Fee', left, y);
+  doc.text(formatMoney(totals.deliveryFee, symbol), right, y, { align: 'right' });
+  y += 20;
+ 
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.text('Total Due on Delivery', left, y);
+  doc.text(formatMoney(totals.total, symbol), right, y, { align: 'right' });
+  y += 26;
+ 
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text('Payment method: Cash on delivery', left, y);
+ 
+  return doc.output('datauristring').replace(/;filename=[^;]*/, '');
+}
+ 
+function sendOrderEmails(pageData, site, orderId, orderDate, customer, items, totals) {
+  const symbol = site.currencySymbol || '$';
+  const cfg = site.emailjs;
+  const statusEl = document.getElementById('email-status');
+ 
+  const itemsText = items
+    .map(it => `${it.qty} x ${it.name} (${formatMoney(it.price, symbol)} per ${it.unit}) = ${formatMoney(it.lineTotal, symbol)}`)
+    .join('\n');
+ 
+  const templateParams = {
+    order_id: orderId,
+    order_date: orderDate,
+    shop_name: site.brandName,
+    customer_name: customer.name,
+    customer_phone: customer.phone,
+    customer_address: customer.address,
+    customer_email: customer.email || 'Not provided',
+    customer_notes: customer.notes || 'None',
+    items_text: itemsText,
+    subtotal: formatMoney(totals.subtotal, symbol),
+    delivery_fee: formatMoney(totals.deliveryFee, symbol),
+    total: formatMoney(totals.total, symbol)
+  };
+ 
+  if (!cfg || !cfg.publicKey || !window.emailjs) {
+    if (statusEl) {
+      statusEl.textContent = 'Automatic email is not set up yet. Please save this receipt, we will confirm your order by phone.';
+      statusEl.className = 'email-status show error';
+    }
+    console.error('EmailJS is not configured. Fill in site.emailjs in content.json.');
+    return;
+  }
+ 
+  const sends = [
+    emailjs.send(cfg.serviceId, cfg.clientTemplateId, {
+      ...templateParams,
+      receipt_pdf: buildReceiptPdf(site, orderId, orderDate, customer, items, totals)
+    })
+      .then(() => ({ ok: true, target: 'client' }))
+      .catch(err => ({ ok: false, target: 'client', err }))
+  ];
+ 
+  if (customer.email) {
+    sends.push(
+      emailjs.send(cfg.serviceId, cfg.customerTemplateId, templateParams)
+        .then(() => ({ ok: true, target: 'customer' }))
+        .catch(err => ({ ok: false, target: 'customer', err }))
+    );
+  }
+ 
+  Promise.all(sends).then(results => {
+    if (!statusEl) return;
+    const allOk = results.every(r => r.ok);
+    if (allOk) {
+      statusEl.textContent = customer.email
+        ? 'A confirmation email has been sent to you and to our team.'
+        : 'A confirmation email has been sent to our team.';
+      statusEl.className = 'email-status show success';
+    } else {
+      results.forEach(r => { if (!r.ok) console.error('EmailJS send failed for', r.target, r.err); });
+      statusEl.textContent = 'We could not send a confirmation email automatically. Please keep this receipt, we will confirm your order by phone.';
+      statusEl.className = 'email-status show error';
+    }
+  });
 }
  
 function showReceipt(pageData, site, orderId, orderDate, customer, items, totals) {
@@ -372,6 +477,10 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(data => {
       document.title = getPath(data, 'site.pageTitle') || document.title;
       bindText(document, data);
+ 
+      if (window.emailjs && data.site && data.site.emailjs && data.site.emailjs.publicKey) {
+        emailjs.init({ publicKey: data.site.emailjs.publicKey });
+      }
  
       if (data.nav) renderNav(data.nav.links);
       if (data.trust) renderTrust(data.trust);
