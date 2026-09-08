@@ -13,16 +13,26 @@
       "customerTemplateId": "template_ru0o8xl"
     }
   },
-
   "nav": {
     "links": [
-      { "label": "Shop", "href": "index.html" },
-      { "label": "Crochet", "href": "order-crochet.html" },
-      { "label": "Ribbons", "href": "order-ribbon.html" },
-      { "label": "Letter", "href": "#about" }
+      {
+        "label": "Shop",
+        "href": "index.html#shop"
+      },
+      {
+        "label": "Crochet",
+        "href": "order-crochet.html"
+      },
+      {
+        "label": "Ribbons",
+        "href": "order-ribbon.html"
+      },
+      {
+        "label": "Letter",
+        "href": "order-letter.html"
+      }
     ]
   },
-
   "hero": {
     "slides": [
       {
@@ -47,31 +57,52 @@
         "eyebrow": "Custom Orders",
         "heading": "Made to Your Size, Color and Budget",
         "body": "Duis ornare, mauris sed rutrum hendrerit, magna quam euismod sapien, nec finibus nulla lorem at enim.",
-        "ctaText": "Request a Custom Quote",
-        "ctaHref": "#custom",
+        "ctaText": "Shop Letter",
+        "ctaHref": "order-letter.html",
         "image": "images/hero-custom.jpg",
         "imageAlt": "Custom made to order craft piece"
       }
     ]
   },
-
   "trust": [
-    { "title": "Handmade", "detail": "Every piece made by hand to order" },
-    { "title": "Shipping", "detail": "Lorem ipsum" },
-    { "title": "Custom colors", "detail": "Choose your own yarn and ribbon colors" },
-    { "title": "Secure checkout", "detail": "Cash on Delivery" }
+    {
+      "title": "Handmade",
+      "detail": "Every piece made by hand to order"
+    },
+    {
+      "title": "Shipping",
+      "detail": "Meet-ups"
+    },
+    {
+      "title": "Custom colors",
+      "detail": "Choose your own yarn and ribbon colors"
+    },
+    {
+      "title": "Secure checkout",
+      "detail": "Cash on Delivery"
+    }
   ],
-
   "categoriesSection": {
     "eyebrow": "Order",
     "heading": "Shop by Category"
   },
   "categories": [
-    { "name": "Crochet", "icon": "crochet", "href": "order-crochet.html" },
-    { "name": "Ribbons", "icon": "ribbon", "href": "order-ribbon.html" },
-    { "name": "Letters", "icon": "", "href": "index.html"}
+    {
+      "name": "Crochet",
+      "icon": "crochet",
+      "href": "order-crochet.html"
+    },
+    {
+      "name": "Ribbons",
+      "icon": "ribbon",
+      "href": "order-ribbon.html"
+    },
+    {
+      "name": "Letters",
+      "icon": "letter",
+      "href": "order-letter.html"
+    }
   ],
-
   "productsSection": {
     "eyebrow": "From the Shop",
     "heading": "Currently Available"
@@ -103,14 +134,72 @@
     },
     {
       "tag": "",
-      "category": "TBA",
-      "name": "TBA",
-      "price": "TBA",
-      "image": "images/product-coaster.jpg",
-      "imageAlt": "TBA"
+      "category": "Letters",
+      "name": "Handwritten Letter",
+      "price": "QAR 20.00",
+      "image": "images/product-letter.jpg",
+      "imageAlt": "Handwritten Letter with decorative border"
     }
   ],
-
+  "colorOptions": {
+    "ribbon": {
+      "colors": [
+        "Black",
+        "Cream",
+        "Lavender",
+        "Light Blue",
+        "Blue",
+        "Red",
+        "Green",
+        "Dusty Pink",
+        "Yellow"
+      ],
+      "wrapper": [
+        "Black",
+        "White"
+      ]
+    },
+    "crochet": {
+      "colors": [
+        "Soft Pink",
+        "Purple",
+        "Light Blue",
+        "Dark Blue",
+        "Red",
+        "Dusty Pink",
+        "Light Green",
+        "White"
+      ]
+    },
+    "letter": {
+      "borderDesigns": [
+        {
+          "name": "Rose Trellis",
+          "image": "images/border-rose-trellis.jpg"
+        },
+        {
+          "name": "Delicate Lace",
+          "image": "images/border-delicate-lace.jpg"
+        },
+        {
+          "name": "Botanical Vine",
+          "image": "images/border-botanical-vine.jpg"
+        },
+        {
+          "name": "Ribbon Edge",
+          "image": "images/border-ribbon-edge.jpg"
+        },
+        {
+          "name": "Dotted Hearts",
+          "image": "images/border-dotted-hearts.jpg"
+        },
+        {
+          "name": "Simple Scallop",
+          "image": "images/border-simple-scallop.jpg"
+        }
+      ]
+    }
+  },
   "orderPages": {
     "crochet": {
       "pageTitle": "Order Crochet Items | Aurelis",
@@ -118,8 +207,16 @@
       "intro": "Choose your items and quantities below, then add your delivery details. Payment is cash on delivery. We will confirm your order and an estimated delivery date by phone before it ships.",
       "deliveryFee": 0,
       "products": [
-        { "name": "Butterfly", "unit": "each", "price": 15.00 },
-        { "name": "Heart w/ Ribbon", "unit": "each", "price": 12.00}
+        {
+          "name": "Butterfly",
+          "unit": "each",
+          "price": 15
+        },
+        {
+          "name": "Heart w/ Ribbon",
+          "unit": "each",
+          "price": 12
+        }
       ]
     },
     "ribbon": {
@@ -128,48 +225,96 @@
       "intro": "Choose your ribbon type and the number of yards, then add your delivery details. Payment is cash on delivery. We will confirm your order and an estimated delivery date by phone before it ships.",
       "deliveryFee": 0,
       "products": [
-        { "name": "Mini Bouquet Keychain", "unit": "each", "price": 15.00 }
+        {
+          "name": "Mini Bouquet Keychain",
+          "unit": "each",
+          "price": 15
+        }
+      ]
+    },
+    "letter": {
+      "pageTitle": "Order a Letter | Aurelis",
+      "heading": "Order a Letter",
+      "intro": "Pick a border design and write your letter below — we'll handwrite it onto that design for you. Then add your delivery details. Payment is cash on delivery. We will confirm your order and an estimated delivery date by phone before it ships.",
+      "deliveryFee": 0,
+      "products": [
+        {
+          "name": "Handwritten Letter",
+          "unit": "each",
+          "price": 20
+        }
       ]
     }
   },
-
   "footer": {
     "columns": [
       {
         "heading": "Shop",
         "links": [
-          { "label": "Crochet", "href": "index.html#crochet" },
-          { "label": "Ribbons", "href": "index.html#ribbons" },
-          { "label": "Wall Art", "href": "index.html#wallart" },
-          { "label": "Gift Sets", "href": "index.html#giftsets" },
-          { "label": "Order Crochet", "href": "order-crochet.html" },
-          { "label": "Order Ribbon", "href": "order-ribbon.html" }
+          {
+            "label": "Crochet",
+            "href": "order-crochet.html"
+          },
+          {
+            "label": "Ribbons",
+            "href": "order-ribbon.html"
+          },
+          {
+            "label": "Letters",
+            "href": "order-letter.html"
+          }
         ]
       },
       {
         "heading": "Support",
         "links": [
-          { "label": "Contact Us", "href": "#contact" },
-          { "label": "Shipping", "href": "#shipping" },
-          { "label": "Returns", "href": "#returns" },
-          { "label": "Care Guide", "href": "#care" }
+          {
+            "label": "Contact Us",
+            "href": "#contact"
+          },
+          {
+            "label": "Shipping",
+            "href": "#shipping"
+          },
+          {
+            "label": "Returns",
+            "href": "#returns"
+          },
+          {
+            "label": "Care Guide",
+            "href": "#care"
+          }
         ]
       },
       {
         "heading": "Studio",
         "links": [
-          { "label": "Our Story", "href": "index.html#about" },
-          { "label": "Custom Orders", "href": "index.html#custom" },
-          { "label": "Wholesale", "href": "#contact" }
+          {
+            "label": "Our Story",
+            "href": "index.html#about"
+          },
+          {
+            "label": "Custom Orders",
+            "href": "index.html#custom"
+          },
+          {
+            "label": "Wholesale",
+            "href": "#contact"
+          }
         ]
       }
     ],
     "legalLinks": [
-      { "label": "Privacy Policy", "href": "privacy-policy.html" },
-      { "label": "Terms and Conditions", "href": "terms-and-conditions.html" }
+      {
+        "label": "Privacy Policy",
+        "href": "privacy-policy.html"
+      },
+      {
+        "label": "Terms and Conditions",
+        "href": "terms-and-conditions.html"
+      }
     ]
   },
-
   "legalPages": {
     "privacyPolicy": {
       "title": "Privacy Policy | Aurelis",

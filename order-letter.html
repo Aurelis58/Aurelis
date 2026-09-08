@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order Crochet Items</title>
+<title>Order a Letter</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Parisienne&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -11,8 +11,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 </head>
-<body data-page="order-crochet">
-
+<body data-page="order-letter">
+ 
 <header>
   <div class="nav-row">
     <div class="logo">
@@ -22,24 +22,24 @@
     <nav class="links" data-list="nav-links"></nav>
   </div>
 </header>
-
+ 
 <section class="order-hero">
   <div class="wrap">
     <h1 data-bind="order.heading"></h1>
     <p data-bind="order.intro"></p>
   </div>
 </section>
-
+ 
 <div class="order-wrap">
-
+ 
   <div class="order-form-section">
     <form id="order-form" novalidate>
-
+ 
       <div class="order-block">
-        <h2>Your Items</h2>
+        <h2>Your Letter</h2>
         <div class="order-items" data-list="order-items"></div>
       </div>
-
+ 
       <div class="order-block">
         <h2>Delivery Details</h2>
         <div class="form-grid">
@@ -64,12 +64,12 @@
             <span class="field-hint">Add your email to also receive a copy of your receipt.</span>
           </div>
           <div class="form-field full">
-            <label for="cust-notes">Notes (color choice, size, etc.)</label>
-            <textarea id="cust-notes" name="notes"></textarea>
+            <label for="cust-notes">Delivery Notes (optional)</label>
+            <textarea id="cust-notes" name="notes" placeholder="e.g. leave with the doorman, call before arriving..."></textarea>
           </div>
         </div>
       </div>
-
+ 
       <div class="order-block">
         <div class="order-summary">
           <div class="summary-row"><span>Subtotal</span><span data-role="subtotal">$0.00</span></div>
@@ -78,15 +78,15 @@
           <p class="summary-note">Payment is cash on delivery. No payment is collected online. Placing this order opens your email app with the order details addressed to us, and a copy is shown below for your records once you submit.</p>
         </div>
       </div>
-
+ 
       <div id="form-msg" class="form-msg"></div>
-
+ 
       <div class="submit-row">
         <button type="submit" class="btn">Place Order</button>
       </div>
     </form>
   </div>
-
+ 
   <div id="receipt-wrap" class="receipt-wrap">
     <div class="receipt-card">
       <div class="receipt-head">
@@ -99,7 +99,7 @@
           <div id="receipt-order-date"></div>
         </div>
       </div>
-
+ 
       <div class="receipt-section">
         <h3>Delivery To</h3>
         <p id="receipt-cust-name"></p>
@@ -108,7 +108,7 @@
         <p id="receipt-cust-email-row">Email: <span id="receipt-cust-email"></span></p>
         <p id="receipt-cust-notes-row">Notes: <span id="receipt-cust-notes"></span></p>
       </div>
-
+ 
       <div class="receipt-section">
         <h3>Items</h3>
         <div id="receipt-lines"></div>
@@ -121,17 +121,17 @@
           <div class="receipt-line"><span>Delivery Fee</span><span id="receipt-delivery"></span></div>
         </div>
       </div>
-
+ 
       <div class="receipt-actions">
         <button type="button" class="btn" onclick="window.print()">Print or Save as PDF</button>
-        <a href="order-crochet.html" class="btn outline">Place Another Order</a>
+        <a href="order-letter.html" class="btn outline">Place Another Order</a>
       </div>
       <p id="email-status" class="email-status"></p>
     </div>
   </div>
-
+ 
 </div>
-
+ 
 <footer>
   <div class="wrap">
     <div class="foot-grid">
@@ -147,7 +147,7 @@
     </div>
   </div>
 </footer>
-
+ 
 <script src="script.js"></script>
 </body>
 </html>

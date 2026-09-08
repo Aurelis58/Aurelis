@@ -1,6 +1,7 @@
 const ICONS = {
   crochet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="9" r="5"/><path d="M13 13l7 7"/></svg>',
   ribbon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 8c8-6 16 6 8 6-8 0-4-12 8-6"/></svg>',
+  letter: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 6l9 7 9-7"/></svg>',
   wallart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 15l3-4 2 3 3-4 3 5"/></svg>',
   giftsets: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v18M4 8l8-5 8 5M4 16l8 5 8-5"/></svg>',
   babykids: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-8-4.6-8-11a4.8 4.8 0 018-3.6A4.8 4.8 0 0120 10c0 6.4-8 11-8 11z"/></svg>',
@@ -159,41 +160,229 @@ function formatMoney(amount, symbol) {
   return `${symbol}${amount.toFixed(2)}`;
 }
  
-function renderOrderPage(pageKey, pageData, site) {
+/* ---------------- color customization helpers ---------------- */
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function buildSelectOptions(list, placeholder) {
+  let html = `<option value="" disabled selected>${placeholder}</option>`;
+  html += list.map(c => `<option value="${c}">${c}</option>`).join('');
+  return html;
+}
+
+function buildBorderSwatches(borderDesigns, groupName) {
+  return borderDesigns.map(b => `
+    <label class="border-swatch">
+      <input type="radio" name="${groupName}" value="${escapeHtml(b.name)}">
+      <span class="border-swatch-card">
+        <img src="${b.image}" alt="${escapeHtml(b.name)}" loading="lazy">
+        <span class="border-swatch-name">${escapeHtml(b.name)}</span>
+      </span>
+    </label>
+  `).join('');
+}
+
+function buildLetterEntryHtml(entryIndex, cardIndex, borderDesigns) {
+  const groupName = `letter-border-${cardIndex}-${entryIndex}`;
+  return `
+    <div class="letter-entry" data-role="letter-entry">
+      <div class="letter-entry-head">Letter ${entryIndex + 1}</div>
+      <div class="option-field" data-role="border-field">
+        <label>Border Design *</label>
+        <div class="border-swatch-grid">${buildBorderSwatches(borderDesigns, groupName)}</div>
+        <span class="option-error">Please choose a border design.</span>
+      </div>
+      <div class="letter-fields-grid">
+        <div class="option-field" data-role="to-field">
+          <label>To *</label>
+          <input type="text" data-role="letter-to" placeholder="e.g. Mom">
+          <span class="option-error">Please enter a recipient.</span>
+        </div>
+        <div class="option-field" data-role="from-field">
+          <label>From *</label>
+          <input type="text" data-role="letter-from" placeholder="e.g. Alex">
+          <span class="option-error">Please enter a sender.</span>
+        </div>
+      </div>
+      <div class="option-field" data-role="message-field">
+        <label>Message *</label>
+        <textarea data-role="letter-message" placeholder="Write your letter here..."></textarea>
+        <span class="option-error">Please write your message.</span>
+      </div>
+    </div>
+  `;
+}
+
+function syncLetterEntries(card, qty, borderDesigns) {
+  const container = card.querySelector('[data-role="letter-entries"]');
+  if (!container) return;
+  const cardIndex = card.getAttribute('data-index');
+  let entries = container.querySelectorAll('[data-role="letter-entry"]');
+  if (qty > entries.length) {
+    for (let i = entries.length; i < qty; i++) {
+      container.insertAdjacentHTML('beforeend', buildLetterEntryHtml(i, cardIndex, borderDesigns));
+    }
+  } else if (qty < entries.length) {
+    for (let i = entries.length - 1; i >= qty; i--) {
+      entries[i].remove();
+    }
+  }
+}
+
+function buildOptionsBlock(pageKey, colorConf, name) {
+  if (!colorConf) return '';
+  if (pageKey === 'ribbon') {
+    return `
+      <div class="order-item-options" data-role="options">
+        <div class="option-field" data-role="color1-field">
+          <label>1st Color *</label>
+          <select data-role="color1" aria-label="1st color for ${name}">
+            ${buildSelectOptions(colorConf.colors, 'Select a color')}
+          </select>
+          <span class="option-error">Please choose a 1st color.</span>
+        </div>
+        <div class="option-field" data-role="color2-field">
+          <label>2nd Color (optional)</label>
+          <select data-role="color2" aria-label="2nd color for ${name}">
+            <option value="">None</option>
+          </select>
+        </div>
+        <div class="option-field" data-role="wrapper-field">
+          <label>Wrapper Color *</label>
+          <select data-role="wrapper" aria-label="Wrapper color for ${name}">
+            ${buildSelectOptions(colorConf.wrapper, 'Select a wrapper color')}
+          </select>
+          <span class="option-error">Please choose a wrapper color.</span>
+        </div>
+      </div>
+    `;
+  }
+  if (pageKey === 'crochet') {
+    return `
+      <div class="order-item-options" data-role="options">
+        <div class="option-field" data-role="color1-field">
+          <label>1st Color *</label>
+          <select data-role="color1" aria-label="1st color for ${name}">
+            ${buildSelectOptions(colorConf.colors, 'Select a color')}
+          </select>
+          <span class="option-error">Please choose a 1st color.</span>
+        </div>
+        <div class="option-field" data-role="color2-field">
+          <label>2nd Color *</label>
+          <select data-role="color2" aria-label="2nd color for ${name}">
+            <option value="" disabled selected>Select a color</option>
+          </select>
+          <span class="option-error">Please choose a 2nd color.</span>
+        </div>
+      </div>
+    `;
+  }
+  if (pageKey === 'letter') {
+    return `
+      <div class="order-item-options" data-role="options">
+        <div class="letter-entries" data-role="letter-entries"></div>
+      </div>
+    `;
+  }
+  return '';
+}
+
+function refreshSecondColor(card, colorConf) {
+  const color2Select = card.querySelector('[data-role="color2"]');
+  if (!color2Select) return;
+  const color1 = card.querySelector('[data-role="color1"]').value;
+  const prevValue = color2Select.value;
+  const secondRequired = !color2Select.querySelector('option[value=""]:not([disabled])');
+  const filtered = colorConf.colors.filter(c => c !== color1);
+  let html = secondRequired
+    ? `<option value="" disabled ${!prevValue ? 'selected' : ''}>Select a color</option>`
+    : `<option value="">None</option>`;
+  html += filtered.map(c => `<option value="${c}" ${c === prevValue ? 'selected' : ''}>${c}</option>`).join('');
+  color2Select.innerHTML = html;
+}
+
+function formatColorLine(pageKey, sel) {
+  if (!sel) return '';
+  if (pageKey === 'ribbon') {
+    const colors = sel.color2 ? `${sel.color1} and ${sel.color2}` : sel.color1;
+    return sel.wrapper ? `${colors} (${sel.wrapper} Wrapper)` : colors;
+  }
+  if (pageKey === 'crochet') {
+    return sel.color2 ? `${sel.color1} and ${sel.color2}` : sel.color1;
+  }
+  if (pageKey === 'letter') {
+    const multi = sel.letters.length > 1;
+    return sel.letters.map((l, i) => {
+      const prefix = multi ? `Letter ${i + 1} \u2014 ` : '';
+      return `${prefix}Design: ${l.border} | To: ${l.to} | From: ${l.from} | "${l.message}"`;
+    }).join('\n');
+  }
+  return '';
+}
+
+function renderOrderPage(pageKey, pageData, site, colorOptions) {
   const symbol = site.currencySymbol || '$';
   const itemsEl = document.querySelector('[data-list="order-items"]');
   if (!itemsEl) return;
- 
+
+  const colorConf = colorOptions ? colorOptions[pageKey] : null;
+
   itemsEl.innerHTML = pageData.products.map((p, i) => `
-    <div class="order-item" data-price="${p.price}" data-index="${i}">
-      <div>
-        <span class="order-item-name">${p.name}</span>
-        <span class="order-item-unit">${formatMoney(p.price, symbol)} per ${p.unit}</span>
+    <div class="order-item-card" data-price="${p.price}" data-index="${i}">
+      <div class="order-item">
+        <div>
+          <span class="order-item-name">${p.name}</span>
+          <span class="order-item-unit">${formatMoney(p.price, symbol)} per ${p.unit}</span>
+        </div>
+        <div class="order-item-price" data-role="line-total">${formatMoney(0, symbol)}</div>
+        <div class="qty-control">
+          <button type="button" class="qty-btn" data-action="minus" aria-label="Decrease quantity">-</button>
+          <input class="qty-input" type="number" min="0" step="1" value="0" data-role="qty" aria-label="Quantity for ${p.name}">
+          <button type="button" class="qty-btn" data-action="plus" aria-label="Increase quantity">+</button>
+        </div>
       </div>
-      <div class="order-item-price" data-role="line-total">${formatMoney(0, symbol)}</div>
-      <div class="qty-control">
-        <button type="button" class="qty-btn" data-action="minus" aria-label="Decrease quantity">-</button>
-        <input class="qty-input" type="number" min="0" step="1" value="0" data-role="qty" aria-label="Quantity for ${p.name}">
-        <button type="button" class="qty-btn" data-action="plus" aria-label="Increase quantity">+</button>
-      </div>
+      ${buildOptionsBlock(pageKey, colorConf, p.name)}
     </div>
   `).join('');
- 
+
+  if (colorConf) {
+    itemsEl.querySelectorAll('.order-item-card').forEach(card => {
+      refreshSecondColor(card, colorConf);
+      const color1Select = card.querySelector('[data-role="color1"]');
+      if (color1Select) {
+        color1Select.addEventListener('change', () => refreshSecondColor(card, colorConf));
+      }
+    });
+  }
+
   const deliveryFee = pageData.deliveryFee || 0;
   const deliveryFeeEls = document.querySelectorAll('[data-role="delivery-fee"]');
   deliveryFeeEls.forEach(el => el.textContent = formatMoney(deliveryFee, symbol));
  
   function recalculate() {
     let subtotal = 0;
-    itemsEl.querySelectorAll('.order-item').forEach(row => {
-      const price = parseFloat(row.getAttribute('data-price'));
-      const qtyInput = row.querySelector('[data-role="qty"]');
+    itemsEl.querySelectorAll('.order-item-card').forEach(card => {
+      const price = parseFloat(card.getAttribute('data-price'));
+      const qtyInput = card.querySelector('[data-role="qty"]');
       let qty = parseInt(qtyInput.value, 10);
       if (isNaN(qty) || qty < 0) qty = 0;
       qtyInput.value = qty;
       const lineTotal = price * qty;
-      row.querySelector('[data-role="line-total"]').textContent = formatMoney(lineTotal, symbol);
+      card.querySelector('[data-role="line-total"]').textContent = formatMoney(lineTotal, symbol);
       subtotal += lineTotal;
+
+      const optionsEl = card.querySelector('[data-role="options"]');
+      if (optionsEl) optionsEl.classList.toggle('show', qty > 0);
+
+      if (pageKey === 'letter' && colorConf) {
+        syncLetterEntries(card, qty, colorConf.borderDesigns);
+      }
     });
     const hasItems = subtotal > 0;
     const total = hasItems ? subtotal + deliveryFee : 0;
@@ -206,8 +395,8 @@ function renderOrderPage(pageKey, pageData, site) {
   itemsEl.addEventListener('click', e => {
     const btn = e.target.closest('.qty-btn');
     if (!btn) return;
-    const row = btn.closest('.order-item');
-    const input = row.querySelector('[data-role="qty"]');
+    const card = btn.closest('.order-item-card');
+    const input = card.querySelector('[data-role="qty"]');
     let qty = parseInt(input.value, 10) || 0;
     qty = btn.getAttribute('data-action') === 'plus' ? qty + 1 : Math.max(0, qty - 1);
     input.value = qty;
@@ -251,10 +440,68 @@ function renderOrderPage(pageKey, pageData, site) {
       msgEl.className = 'form-msg error show';
       valid = false;
     }
+
+    // validate color/customization selections for any item with a quantity
+    let colorsValid = true;
+    itemsEl.querySelectorAll('.order-item-card').forEach(card => {
+      const qty = parseInt(card.querySelector('[data-role="qty"]').value, 10) || 0;
+      if (qty <= 0) {
+        card.querySelectorAll('.option-field').forEach(f => f.classList.remove('invalid'));
+        return;
+      }
+
+      if (pageKey === 'letter') {
+        card.querySelectorAll('[data-role="letter-entry"]').forEach(entryEl => {
+          const borderField = entryEl.querySelector('[data-role="border-field"]');
+          const checkedBorder = entryEl.querySelector('input[type="radio"]:checked');
+          if (!checkedBorder) { borderField.classList.add('invalid'); colorsValid = false; }
+          else borderField.classList.remove('invalid');
+
+          const toField = entryEl.querySelector('[data-role="to-field"]');
+          const toInput = entryEl.querySelector('[data-role="letter-to"]');
+          if (!toInput.value.trim()) { toField.classList.add('invalid'); colorsValid = false; }
+          else toField.classList.remove('invalid');
+
+          const fromField = entryEl.querySelector('[data-role="from-field"]');
+          const fromInput = entryEl.querySelector('[data-role="letter-from"]');
+          if (!fromInput.value.trim()) { fromField.classList.add('invalid'); colorsValid = false; }
+          else fromField.classList.remove('invalid');
+
+          const msgField = entryEl.querySelector('[data-role="message-field"]');
+          const msgInput = entryEl.querySelector('[data-role="letter-message"]');
+          if (!msgInput.value.trim()) { msgField.classList.add('invalid'); colorsValid = false; }
+          else msgField.classList.remove('invalid');
+        });
+        return;
+      }
+
+      const color1Select = card.querySelector('[data-role="color1"]');
+      const color2Select = card.querySelector('[data-role="color2"]');
+      const wrapperSelect = card.querySelector('[data-role="wrapper"]');
+
+      if (color1Select) {
+        const field = card.querySelector('[data-role="color1-field"]');
+        if (!color1Select.value) { field.classList.add('invalid'); colorsValid = false; }
+        else field.classList.remove('invalid');
+      }
+      if (color2Select && pageKey === 'crochet') {
+        const field = card.querySelector('[data-role="color2-field"]');
+        if (!color2Select.value) { field.classList.add('invalid'); colorsValid = false; }
+        else field.classList.remove('invalid');
+      }
+      if (wrapperSelect) {
+        const field = card.querySelector('[data-role="wrapper-field"]');
+        if (!wrapperSelect.value) { field.classList.add('invalid'); colorsValid = false; }
+        else field.classList.remove('invalid');
+      }
+    });
+    if (!colorsValid) valid = false;
  
     if (!valid) {
       if (totals.hasItems) {
-        msgEl.textContent = 'Please fill in your name, phone number and delivery address.';
+        msgEl.textContent = colorsValid
+          ? 'Please fill in your name, phone number and delivery address.'
+          : 'Please fill in the required details for each item, and fill in your name, phone number and delivery address.';
         msgEl.className = 'form-msg error show';
       }
       return;
@@ -262,12 +509,42 @@ function renderOrderPage(pageKey, pageData, site) {
     msgEl.className = 'form-msg';
  
     const orderedItems = [];
-    itemsEl.querySelectorAll('.order-item').forEach(row => {
-      const idx = parseInt(row.getAttribute('data-index'), 10);
-      const qty = parseInt(row.querySelector('[data-role="qty"]').value, 10) || 0;
+    itemsEl.querySelectorAll('.order-item-card').forEach(card => {
+      const idx = parseInt(card.getAttribute('data-index'), 10);
+      const qty = parseInt(card.querySelector('[data-role="qty"]').value, 10) || 0;
       if (qty > 0) {
         const product = pageData.products[idx];
-        orderedItems.push({ name: product.name, unit: product.unit, price: product.price, qty, lineTotal: product.price * qty });
+        let sel;
+        if (pageKey === 'letter') {
+          const letters = [];
+          card.querySelectorAll('[data-role="letter-entry"]').forEach(entryEl => {
+            const checkedBorder = entryEl.querySelector('input[type="radio"]:checked');
+            letters.push({
+              border: checkedBorder ? checkedBorder.value : '',
+              to: entryEl.querySelector('[data-role="letter-to"]').value.trim(),
+              from: entryEl.querySelector('[data-role="letter-from"]').value.trim(),
+              message: entryEl.querySelector('[data-role="letter-message"]').value.trim()
+            });
+          });
+          sel = { letters };
+        } else {
+          const color1Select = card.querySelector('[data-role="color1"]');
+          const color2Select = card.querySelector('[data-role="color2"]');
+          const wrapperSelect = card.querySelector('[data-role="wrapper"]');
+          sel = {
+            color1: color1Select ? color1Select.value : '',
+            color2: color2Select ? color2Select.value : '',
+            wrapper: wrapperSelect ? wrapperSelect.value : ''
+          };
+        }
+        orderedItems.push({
+          name: product.name,
+          unit: product.unit,
+          price: product.price,
+          qty,
+          lineTotal: product.price * qty,
+          colorLine: formatColorLine(pageKey, sel)
+        });
       }
     });
  
@@ -331,6 +608,17 @@ function buildReceiptPdf(site, orderId, orderDate, customer, items, totals) {
     doc.text(`${it.qty} x ${it.name} (${it.unit})`, left, y);
     doc.text(formatMoney(it.lineTotal, symbol), right, y, { align: 'right' });
     y += 14;
+    if (it.colorLine) {
+      doc.setFontSize(9);
+      it.colorLine.split('\n').forEach(line => {
+        const wrapped = doc.splitTextToSize(`* ${line}`, right - left - 10);
+        wrapped.forEach(wLine => {
+          doc.text(wLine, left + 10, y);
+          y += 12;
+        });
+      });
+      doc.setFontSize(10);
+    }
   });
  
   y += 6;
@@ -359,14 +647,34 @@ function buildReceiptPdf(site, orderId, orderDate, customer, items, totals) {
   return doc.output('datauristring').replace(/;filename=[^;]*/, '');
 }
  
+function buildItemsHtml(items, symbol) {
+  return items.map(it => `
+    <tr>
+      <td style="padding:12px 0;border-bottom:1px solid #f0dde1;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#3a3128;vertical-align:top;">
+        <div style="font-weight:600;">${it.qty} &times; ${escapeHtml(it.name)} <span style="font-weight:400;color:#8a7f74;">(${escapeHtml(it.unit)})</span></div>
+        ${it.colorLine ? it.colorLine.split('\n').map(line => `<div style="font-size:12.5px;font-style:italic;color:#8a7f74;margin-top:4px;">* ${escapeHtml(line)}</div>`).join('') : ''}
+      </td>
+      <td style="padding:12px 0;border-bottom:1px solid #f0dde1;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#8f4d55;text-align:right;white-space:nowrap;vertical-align:top;">
+        ${formatMoney(it.lineTotal, symbol)}
+      </td>
+    </tr>
+  `).join('');
+}
+
 function sendOrderEmails(pageData, site, orderId, orderDate, customer, items, totals) {
   const symbol = site.currencySymbol || '$';
   const cfg = site.emailjs;
   const statusEl = document.getElementById('email-status');
  
   const itemsText = items
-    .map(it => `${it.qty} x ${it.name} (${formatMoney(it.price, symbol)} per ${it.unit}) = ${formatMoney(it.lineTotal, symbol)}`)
+    .map(it => {
+      const base = `${it.qty} x ${it.name} (${formatMoney(it.price, symbol)} per ${it.unit}) = ${formatMoney(it.lineTotal, symbol)}`;
+      const colorPart = it.colorLine ? it.colorLine.split('\n').map(line => `\n   * ${line}`).join('') : '';
+      return base + colorPart;
+    })
     .join('\n');
+
+  const itemsHtml = buildItemsHtml(items, symbol);
  
   const templateParams = {
     order_id: orderId,
@@ -377,7 +685,10 @@ function sendOrderEmails(pageData, site, orderId, orderDate, customer, items, to
     customer_address: customer.address,
     customer_email: customer.email || 'Not provided',
     customer_notes: customer.notes || 'None',
+    has_notes: customer.notes ? 'yes' : '',
+    has_email: customer.email ? 'yes' : '',
     items_text: itemsText,
+    items_html: itemsHtml,
     subtotal: formatMoney(totals.subtotal, symbol),
     delivery_fee: formatMoney(totals.deliveryFee, symbol),
     total: formatMoney(totals.total, symbol)
@@ -459,6 +770,7 @@ function showReceipt(pageData, site, orderId, orderDate, customer, items, totals
       <span>${it.qty} x ${it.name} (${it.unit})</span>
       <span>${formatMoney(it.lineTotal, symbol)}</span>
     </div>
+    ${it.colorLine ? it.colorLine.split('\n').map(line => `<div class="receipt-line-sub">* ${escapeHtml(line)}</div>`).join('') : ''}
   `).join('');
  
   document.getElementById('receipt-subtotal').textContent = formatMoney(totals.subtotal, symbol);
@@ -503,12 +815,17 @@ document.addEventListener('DOMContentLoaded', () => {
       if (page === 'order-crochet' && data.orderPages) {
         document.title = data.orderPages.crochet.pageTitle;
         bindText(document, { order: data.orderPages.crochet });
-        renderOrderPage('crochet', data.orderPages.crochet, data.site);
+        renderOrderPage('crochet', data.orderPages.crochet, data.site, data.colorOptions);
       }
       if (page === 'order-ribbon' && data.orderPages) {
         document.title = data.orderPages.ribbon.pageTitle;
         bindText(document, { order: data.orderPages.ribbon });
-        renderOrderPage('ribbon', data.orderPages.ribbon, data.site);
+        renderOrderPage('ribbon', data.orderPages.ribbon, data.site, data.colorOptions);
+      }
+      if (page === 'order-letter' && data.orderPages) {
+        document.title = data.orderPages.letter.pageTitle;
+        bindText(document, { order: data.orderPages.letter });
+        renderOrderPage('letter', data.orderPages.letter, data.site, data.colorOptions);
       }
  
       if (document.getElementById('slides')) {
