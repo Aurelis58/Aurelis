@@ -172,6 +172,26 @@
       ]
     },
     "letter": {
+      "sizes": [
+        {
+          "name": "Small",
+          "paperSize": "A6",
+          "dimensions": "10.5 x 14.8 cm",
+          "price": 8
+        },
+        {
+          "name": "Medium",
+          "paperSize": "A5",
+          "dimensions": "14.8 x 21.0 cm",
+          "price": 13
+        },
+        {
+          "name": "Large",
+          "paperSize": "A4",
+          "dimensions": "20.1 x 29.7 cm",
+          "price": 15
+        }
+      ],
       "borderDesigns": [
         {
           "name": "Rose Trellis",

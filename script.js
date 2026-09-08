@@ -188,15 +188,38 @@ function buildBorderSwatches(borderDesigns, groupName) {
   `).join('');
 }
 
-function buildLetterEntryHtml(entryIndex, cardIndex, borderDesigns) {
+function buildSizeOptions(sizes, groupName, symbol) {
+  return sizes.map(s => `
+    <label class="size-option">
+      <input type="radio" name="${groupName}" value="${escapeHtml(s.name)}" data-role="size-radio" data-price="${s.price}">
+      <span class="size-option-card">
+        <span class="size-option-name">${escapeHtml(s.name)}</span>
+        <span class="size-option-paper">${escapeHtml(s.paperSize || '')}</span>
+        <span class="size-option-dims">${escapeHtml(s.dimensions)}</span>
+        <span class="size-option-price">${formatMoney(s.price, symbol)}</span>
+      </span>
+    </label>
+  `).join('');
+}
+
+function buildLetterEntryHtml(entryIndex, cardIndex, borderDesigns, sizes, symbol) {
   const groupName = `letter-border-${cardIndex}-${entryIndex}`;
+  const sizeGroupName = `letter-size-${cardIndex}-${entryIndex}`;
   return `
     <div class="letter-entry" data-role="letter-entry">
-      <div class="letter-entry-head">Letter ${entryIndex + 1}</div>
+      <div class="letter-entry-head">
+        <span>Letter ${entryIndex + 1}</span>
+        ${entryIndex > 0 ? `<button type="button" class="copy-prev-btn" data-action="copy-prev">+ Same as previous</button>` : ''}
+      </div>
       <div class="option-field" data-role="border-field">
         <label>Border Design *</label>
         <div class="border-swatch-grid">${buildBorderSwatches(borderDesigns, groupName)}</div>
         <span class="option-error">Please choose a border design.</span>
+      </div>
+      <div class="option-field" data-role="size-field">
+        <label>Letter Size *</label>
+        <div class="size-option-grid">${buildSizeOptions(sizes, sizeGroupName, symbol)}</div>
+        <span class="option-error">Please choose a letter size.</span>
       </div>
       <div class="letter-fields-grid">
         <div class="option-field" data-role="to-field">
@@ -219,14 +242,14 @@ function buildLetterEntryHtml(entryIndex, cardIndex, borderDesigns) {
   `;
 }
 
-function syncLetterEntries(card, qty, borderDesigns) {
+function syncLetterEntries(card, qty, borderDesigns, sizes, symbol) {
   const container = card.querySelector('[data-role="letter-entries"]');
   if (!container) return;
   const cardIndex = card.getAttribute('data-index');
   let entries = container.querySelectorAll('[data-role="letter-entry"]');
   if (qty > entries.length) {
     for (let i = entries.length; i < qty; i++) {
-      container.insertAdjacentHTML('beforeend', buildLetterEntryHtml(i, cardIndex, borderDesigns));
+      container.insertAdjacentHTML('beforeend', buildLetterEntryHtml(i, cardIndex, borderDesigns, sizes, symbol));
     }
   } else if (qty < entries.length) {
     for (let i = entries.length - 1; i >= qty; i--) {
@@ -237,49 +260,10 @@ function syncLetterEntries(card, qty, borderDesigns) {
 
 function buildOptionsBlock(pageKey, colorConf, name) {
   if (!colorConf) return '';
-  if (pageKey === 'ribbon') {
+  if (pageKey === 'ribbon' || pageKey === 'crochet') {
     return `
       <div class="order-item-options" data-role="options">
-        <div class="option-field" data-role="color1-field">
-          <label>1st Color *</label>
-          <select data-role="color1" aria-label="1st color for ${name}">
-            ${buildSelectOptions(colorConf.colors, 'Select a color')}
-          </select>
-          <span class="option-error">Please choose a 1st color.</span>
-        </div>
-        <div class="option-field" data-role="color2-field">
-          <label>2nd Color (optional)</label>
-          <select data-role="color2" aria-label="2nd color for ${name}">
-            <option value="">None</option>
-          </select>
-        </div>
-        <div class="option-field" data-role="wrapper-field">
-          <label>Wrapper Color *</label>
-          <select data-role="wrapper" aria-label="Wrapper color for ${name}">
-            ${buildSelectOptions(colorConf.wrapper, 'Select a wrapper color')}
-          </select>
-          <span class="option-error">Please choose a wrapper color.</span>
-        </div>
-      </div>
-    `;
-  }
-  if (pageKey === 'crochet') {
-    return `
-      <div class="order-item-options" data-role="options">
-        <div class="option-field" data-role="color1-field">
-          <label>1st Color *</label>
-          <select data-role="color1" aria-label="1st color for ${name}">
-            ${buildSelectOptions(colorConf.colors, 'Select a color')}
-          </select>
-          <span class="option-error">Please choose a 1st color.</span>
-        </div>
-        <div class="option-field" data-role="color2-field">
-          <label>2nd Color *</label>
-          <select data-role="color2" aria-label="2nd color for ${name}">
-            <option value="" disabled selected>Select a color</option>
-          </select>
-          <span class="option-error">Please choose a 2nd color.</span>
-        </div>
+        <div class="customization-entries" data-role="customization-entries"></div>
       </div>
     `;
   }
@@ -291,6 +275,87 @@ function buildOptionsBlock(pageKey, colorConf, name) {
     `;
   }
   return '';
+}
+
+function buildCustomizationEntryHtml(entryIndex, pageKey, colorConf, name) {
+  const label = `${name} ${entryIndex + 1}`;
+  if (pageKey === 'ribbon') {
+    return `
+      <div class="customization-entry" data-role="customization-entry">
+        <div class="customization-entry-head">
+          <span>${escapeHtml(label)}</span>
+          ${entryIndex > 0 ? `<button type="button" class="copy-prev-btn" data-action="copy-prev">+ Same as previous</button>` : ''}
+        </div>
+        <div class="option-field" data-role="color1-field">
+          <label>1st Color *</label>
+          <select data-role="color1" aria-label="1st color for ${escapeHtml(label)}">
+            ${buildSelectOptions(colorConf.colors, 'Select a color')}
+          </select>
+          <span class="option-error">Please choose a 1st color.</span>
+        </div>
+        <div class="option-field" data-role="color2-field">
+          <label>2nd Color (optional)</label>
+          <select data-role="color2" aria-label="2nd color for ${escapeHtml(label)}">
+            <option value="">None</option>
+          </select>
+        </div>
+        <div class="option-field" data-role="wrapper-field">
+          <label>Wrapper Color *</label>
+          <select data-role="wrapper" aria-label="Wrapper color for ${escapeHtml(label)}">
+            ${buildSelectOptions(colorConf.wrapper, 'Select a wrapper color')}
+          </select>
+          <span class="option-error">Please choose a wrapper color.</span>
+        </div>
+      </div>
+    `;
+  }
+  if (pageKey === 'crochet') {
+    return `
+      <div class="customization-entry" data-role="customization-entry">
+        <div class="customization-entry-head">
+          <span>${escapeHtml(label)}</span>
+          ${entryIndex > 0 ? `<button type="button" class="copy-prev-btn" data-action="copy-prev">+ Same as previous</button>` : ''}
+        </div>
+        <div class="option-field" data-role="color1-field">
+          <label>1st Color *</label>
+          <select data-role="color1" aria-label="1st color for ${escapeHtml(label)}">
+            ${buildSelectOptions(colorConf.colors, 'Select a color')}
+          </select>
+          <span class="option-error">Please choose a 1st color.</span>
+        </div>
+        <div class="option-field" data-role="color2-field">
+          <label>2nd Color *</label>
+          <select data-role="color2" aria-label="2nd color for ${escapeHtml(label)}">
+            <option value="" disabled selected>Select a color</option>
+          </select>
+          <span class="option-error">Please choose a 2nd color.</span>
+        </div>
+      </div>
+    `;
+  }
+  return '';
+}
+
+function syncCustomizationEntries(card, qty, pageKey, colorConf, name) {
+  const container = card.querySelector('[data-role="customization-entries"]');
+  if (!container) return;
+  let entries = container.querySelectorAll('[data-role="customization-entry"]');
+  if (qty > entries.length) {
+    for (let i = entries.length; i < qty; i++) {
+      container.insertAdjacentHTML('beforeend', buildCustomizationEntryHtml(i, pageKey, colorConf, name));
+    }
+    // initialize the 2nd-color list for any newly added entries
+    container.querySelectorAll('[data-role="customization-entry"]').forEach(entryEl => {
+      if (!entryEl.dataset.initialized) {
+        refreshSecondColor(entryEl, colorConf);
+        entryEl.dataset.initialized = 'true';
+      }
+    });
+  } else if (qty < entries.length) {
+    for (let i = entries.length - 1; i >= qty; i--) {
+      entries[i].remove();
+    }
+  }
 }
 
 function refreshSecondColor(card, colorConf) {
@@ -307,20 +372,66 @@ function refreshSecondColor(card, colorConf) {
   color2Select.innerHTML = html;
 }
 
+function copyCustomizationEntry(fromEntry, toEntry, colorConf) {
+  const color1From = fromEntry.querySelector('[data-role="color1"]');
+  const color1To = toEntry.querySelector('[data-role="color1"]');
+  const color2From = fromEntry.querySelector('[data-role="color2"]');
+  const color2To = toEntry.querySelector('[data-role="color2"]');
+  const wrapperFrom = fromEntry.querySelector('[data-role="wrapper"]');
+  const wrapperTo = toEntry.querySelector('[data-role="wrapper"]');
+
+  if (color1From && color1To) color1To.value = color1From.value;
+  if (color2From && color2To) color2To.value = color2From.value;
+  if (colorConf && color1To) refreshSecondColor(toEntry, colorConf);
+  if (wrapperFrom && wrapperTo) wrapperTo.value = wrapperFrom.value;
+
+  toEntry.querySelectorAll('.option-field.invalid').forEach(f => f.classList.remove('invalid'));
+}
+
+function copyLetterEntry(fromEntry, toEntry) {
+  const borderFrom = fromEntry.querySelector('[data-role="border-field"] input[type="radio"]:checked');
+  if (borderFrom) {
+    const match = toEntry.querySelector(`[data-role="border-field"] input[type="radio"][value="${CSS.escape(borderFrom.value)}"]`);
+    if (match) match.checked = true;
+  }
+  const sizeFrom = fromEntry.querySelector('[data-role="size-field"] input[type="radio"]:checked');
+  if (sizeFrom) {
+    const match = toEntry.querySelector(`[data-role="size-field"] input[type="radio"][value="${CSS.escape(sizeFrom.value)}"]`);
+    if (match) match.checked = true;
+  }
+  const toFrom = fromEntry.querySelector('[data-role="letter-to"]');
+  const toTo = toEntry.querySelector('[data-role="letter-to"]');
+  if (toFrom && toTo) toTo.value = toFrom.value;
+  const fromFrom = fromEntry.querySelector('[data-role="letter-from"]');
+  const fromTo = toEntry.querySelector('[data-role="letter-from"]');
+  if (fromFrom && fromTo) fromTo.value = fromFrom.value;
+  const msgFrom = fromEntry.querySelector('[data-role="letter-message"]');
+  const msgTo = toEntry.querySelector('[data-role="letter-message"]');
+  if (msgFrom && msgTo) msgTo.value = msgFrom.value;
+
+  toEntry.querySelectorAll('.option-field.invalid').forEach(f => f.classList.remove('invalid'));
+}
+
 function formatColorLine(pageKey, sel) {
   if (!sel) return '';
-  if (pageKey === 'ribbon') {
-    const colors = sel.color2 ? `${sel.color1} and ${sel.color2}` : sel.color1;
-    return sel.wrapper ? `${colors} (${sel.wrapper} Wrapper)` : colors;
-  }
-  if (pageKey === 'crochet') {
-    return sel.color2 ? `${sel.color1} and ${sel.color2}` : sel.color1;
+  if (pageKey === 'ribbon' || pageKey === 'crochet') {
+    const list = sel.customizations || [];
+    const groups = [];
+    list.forEach(c => {
+      const colors = c.color2 ? `${c.color1} and ${c.color2}` : c.color1;
+      const wrapperPart = (pageKey === 'ribbon' && c.wrapper) ? ` (${c.wrapper} Wrapper)` : '';
+      const label = `${colors}${wrapperPart}`;
+      const existing = groups.find(g => g.label === label);
+      if (existing) existing.count++;
+      else groups.push({ label, count: 1 });
+    });
+    return groups.map(g => g.count > 1 ? `${g.count} \u00d7 ${g.label}` : g.label).join('\n');
   }
   if (pageKey === 'letter') {
     const multi = sel.letters.length > 1;
     return sel.letters.map((l, i) => {
       const prefix = multi ? `Letter ${i + 1} \u2014 ` : '';
-      return `${prefix}Design: ${l.border} | To: ${l.to} | From: ${l.from} | "${l.message}"`;
+      return `${prefix}Design: ${l.border} | Size: ${l.size} (${l.sizeDimensions}, ${l.sizePrice}) | To: ${l.to} | From: ${l.from} | "${l.message}"`;
     }).join('\n');
   }
   return '';
@@ -333,12 +444,17 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
 
   const colorConf = colorOptions ? colorOptions[pageKey] : null;
 
-  itemsEl.innerHTML = pageData.products.map((p, i) => `
+  itemsEl.innerHTML = pageData.products.map((p, i) => {
+    const letterSizes = (pageKey === 'letter' && colorConf && colorConf.sizes) ? colorConf.sizes : null;
+    const unitLabel = letterSizes && letterSizes.length
+      ? `From ${formatMoney(Math.min(...letterSizes.map(s => s.price)), symbol)}`
+      : `${formatMoney(p.price, symbol)} per ${p.unit}`;
+    return `
     <div class="order-item-card" data-price="${p.price}" data-index="${i}">
       <div class="order-item">
         <div>
           <span class="order-item-name">${p.name}</span>
-          <span class="order-item-unit">${formatMoney(p.price, symbol)} per ${p.unit}</span>
+          <span class="order-item-unit">${unitLabel}</span>
         </div>
         <div class="order-item-price" data-role="line-total">${formatMoney(0, symbol)}</div>
         <div class="qty-control">
@@ -349,17 +465,8 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
       </div>
       ${buildOptionsBlock(pageKey, colorConf, p.name)}
     </div>
-  `).join('');
-
-  if (colorConf) {
-    itemsEl.querySelectorAll('.order-item-card').forEach(card => {
-      refreshSecondColor(card, colorConf);
-      const color1Select = card.querySelector('[data-role="color1"]');
-      if (color1Select) {
-        color1Select.addEventListener('change', () => refreshSecondColor(card, colorConf));
-      }
-    });
-  }
+  `;
+  }).join('');
 
   const deliveryFee = pageData.deliveryFee || 0;
   const deliveryFeeEls = document.querySelectorAll('[data-role="delivery-fee"]');
@@ -369,20 +476,32 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
     let subtotal = 0;
     itemsEl.querySelectorAll('.order-item-card').forEach(card => {
       const price = parseFloat(card.getAttribute('data-price'));
+      const idx = parseInt(card.getAttribute('data-index'), 10);
       const qtyInput = card.querySelector('[data-role="qty"]');
       let qty = parseInt(qtyInput.value, 10);
       if (isNaN(qty) || qty < 0) qty = 0;
       qtyInput.value = qty;
-      const lineTotal = price * qty;
+
+      if (pageKey === 'letter' && colorConf) {
+        syncLetterEntries(card, qty, colorConf.borderDesigns, colorConf.sizes, symbol);
+      } else if ((pageKey === 'ribbon' || pageKey === 'crochet') && colorConf) {
+        syncCustomizationEntries(card, qty, pageKey, colorConf, pageData.products[idx].name);
+      }
+
+      let lineTotal;
+      if (pageKey === 'letter') {
+        lineTotal = 0;
+        card.querySelectorAll('[data-role="size-radio"]:checked').forEach(r => {
+          lineTotal += parseFloat(r.getAttribute('data-price')) || 0;
+        });
+      } else {
+        lineTotal = price * qty;
+      }
       card.querySelector('[data-role="line-total"]').textContent = formatMoney(lineTotal, symbol);
       subtotal += lineTotal;
 
       const optionsEl = card.querySelector('[data-role="options"]');
       if (optionsEl) optionsEl.classList.toggle('show', qty > 0);
-
-      if (pageKey === 'letter' && colorConf) {
-        syncLetterEntries(card, qty, colorConf.borderDesigns);
-      }
     });
     const hasItems = subtotal > 0;
     const total = hasItems ? subtotal + deliveryFee : 0;
@@ -394,16 +513,39 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
  
   itemsEl.addEventListener('click', e => {
     const btn = e.target.closest('.qty-btn');
-    if (!btn) return;
-    const card = btn.closest('.order-item-card');
-    const input = card.querySelector('[data-role="qty"]');
-    let qty = parseInt(input.value, 10) || 0;
-    qty = btn.getAttribute('data-action') === 'plus' ? qty + 1 : Math.max(0, qty - 1);
-    input.value = qty;
-    recalculate();
+    if (btn) {
+      const card = btn.closest('.order-item-card');
+      const input = card.querySelector('[data-role="qty"]');
+      let qty = parseInt(input.value, 10) || 0;
+      qty = btn.getAttribute('data-action') === 'plus' ? qty + 1 : Math.max(0, qty - 1);
+      input.value = qty;
+      recalculate();
+      return;
+    }
+
+    const copyBtn = e.target.closest('[data-action="copy-prev"]');
+    if (copyBtn) {
+      const entry = copyBtn.closest('[data-role="customization-entry"], [data-role="letter-entry"]');
+      if (!entry) return;
+      const prevEntry = entry.previousElementSibling;
+      if (!prevEntry) return;
+      if (entry.matches('[data-role="customization-entry"]')) {
+        copyCustomizationEntry(prevEntry, entry, colorConf);
+      } else if (entry.matches('[data-role="letter-entry"]')) {
+        copyLetterEntry(prevEntry, entry);
+      }
+      recalculate();
+    }
   });
   itemsEl.addEventListener('input', e => {
     if (e.target.matches('[data-role="qty"]')) recalculate();
+  });
+  itemsEl.addEventListener('change', e => {
+    if (e.target.matches('[data-role="size-radio"]')) recalculate();
+    if (e.target.matches('[data-role="color1"]')) {
+      const entry = e.target.closest('[data-role="customization-entry"]');
+      if (entry && colorConf) refreshSecondColor(entry, colorConf);
+    }
   });
  
   recalculate();
@@ -453,9 +595,14 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
       if (pageKey === 'letter') {
         card.querySelectorAll('[data-role="letter-entry"]').forEach(entryEl => {
           const borderField = entryEl.querySelector('[data-role="border-field"]');
-          const checkedBorder = entryEl.querySelector('input[type="radio"]:checked');
+          const checkedBorder = borderField.querySelector('input[type="radio"]:checked');
           if (!checkedBorder) { borderField.classList.add('invalid'); colorsValid = false; }
           else borderField.classList.remove('invalid');
+
+          const sizeField = entryEl.querySelector('[data-role="size-field"]');
+          const checkedSize = entryEl.querySelector('[data-role="size-field"] input[type="radio"]:checked');
+          if (!checkedSize) { sizeField.classList.add('invalid'); colorsValid = false; }
+          else sizeField.classList.remove('invalid');
 
           const toField = entryEl.querySelector('[data-role="to-field"]');
           const toInput = entryEl.querySelector('[data-role="letter-to"]');
@@ -475,25 +622,27 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
         return;
       }
 
-      const color1Select = card.querySelector('[data-role="color1"]');
-      const color2Select = card.querySelector('[data-role="color2"]');
-      const wrapperSelect = card.querySelector('[data-role="wrapper"]');
+      card.querySelectorAll('[data-role="customization-entry"]').forEach(entryEl => {
+        const color1Select = entryEl.querySelector('[data-role="color1"]');
+        const color2Select = entryEl.querySelector('[data-role="color2"]');
+        const wrapperSelect = entryEl.querySelector('[data-role="wrapper"]');
 
-      if (color1Select) {
-        const field = card.querySelector('[data-role="color1-field"]');
-        if (!color1Select.value) { field.classList.add('invalid'); colorsValid = false; }
-        else field.classList.remove('invalid');
-      }
-      if (color2Select && pageKey === 'crochet') {
-        const field = card.querySelector('[data-role="color2-field"]');
-        if (!color2Select.value) { field.classList.add('invalid'); colorsValid = false; }
-        else field.classList.remove('invalid');
-      }
-      if (wrapperSelect) {
-        const field = card.querySelector('[data-role="wrapper-field"]');
-        if (!wrapperSelect.value) { field.classList.add('invalid'); colorsValid = false; }
-        else field.classList.remove('invalid');
-      }
+        if (color1Select) {
+          const field = entryEl.querySelector('[data-role="color1-field"]');
+          if (!color1Select.value) { field.classList.add('invalid'); colorsValid = false; }
+          else field.classList.remove('invalid');
+        }
+        if (color2Select && pageKey === 'crochet') {
+          const field = entryEl.querySelector('[data-role="color2-field"]');
+          if (!color2Select.value) { field.classList.add('invalid'); colorsValid = false; }
+          else field.classList.remove('invalid');
+        }
+        if (wrapperSelect) {
+          const field = entryEl.querySelector('[data-role="wrapper-field"]');
+          if (!wrapperSelect.value) { field.classList.add('invalid'); colorsValid = false; }
+          else field.classList.remove('invalid');
+        }
+      });
     });
     if (!colorsValid) valid = false;
  
@@ -515,35 +664,53 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
       if (qty > 0) {
         const product = pageData.products[idx];
         let sel;
+        let lineTotal;
         if (pageKey === 'letter') {
           const letters = [];
           card.querySelectorAll('[data-role="letter-entry"]').forEach(entryEl => {
-            const checkedBorder = entryEl.querySelector('input[type="radio"]:checked');
+            const checkedBorder = entryEl.querySelector('[data-role="border-field"] input[type="radio"]:checked');
+            const checkedSize = entryEl.querySelector('[data-role="size-field"] input[type="radio"]:checked');
+            const borderName = checkedBorder ? checkedBorder.value : '';
+            const sizeName = checkedSize ? checkedSize.value : '';
+            const borderInfo = (colorConf && colorConf.borderDesigns || []).find(b => b.name === borderName);
+            const sizeInfo = (colorConf && colorConf.sizes || []).find(s => s.name === sizeName);
+            const sizePrice = sizeInfo ? sizeInfo.price : (checkedSize ? parseFloat(checkedSize.getAttribute('data-price')) || 0 : 0);
             letters.push({
-              border: checkedBorder ? checkedBorder.value : '',
+              border: borderName,
+              borderImage: borderInfo ? borderInfo.image : '',
+              size: sizeName,
+              sizeDimensions: sizeInfo ? sizeInfo.dimensions : '',
+              sizePrice,
               to: entryEl.querySelector('[data-role="letter-to"]').value.trim(),
               from: entryEl.querySelector('[data-role="letter-from"]').value.trim(),
               message: entryEl.querySelector('[data-role="letter-message"]').value.trim()
             });
           });
           sel = { letters };
+          lineTotal = letters.reduce((sum, l) => sum + (l.sizePrice || 0), 0);
         } else {
-          const color1Select = card.querySelector('[data-role="color1"]');
-          const color2Select = card.querySelector('[data-role="color2"]');
-          const wrapperSelect = card.querySelector('[data-role="wrapper"]');
-          sel = {
-            color1: color1Select ? color1Select.value : '',
-            color2: color2Select ? color2Select.value : '',
-            wrapper: wrapperSelect ? wrapperSelect.value : ''
-          };
+          const customizations = [];
+          card.querySelectorAll('[data-role="customization-entry"]').forEach(entryEl => {
+            const color1Select = entryEl.querySelector('[data-role="color1"]');
+            const color2Select = entryEl.querySelector('[data-role="color2"]');
+            const wrapperSelect = entryEl.querySelector('[data-role="wrapper"]');
+            customizations.push({
+              color1: color1Select ? color1Select.value : '',
+              color2: color2Select ? color2Select.value : '',
+              wrapper: wrapperSelect ? wrapperSelect.value : ''
+            });
+          });
+          sel = { customizations };
+          lineTotal = product.price * qty;
         }
         orderedItems.push({
           name: product.name,
           unit: product.unit,
           price: product.price,
           qty,
-          lineTotal: product.price * qty,
-          colorLine: formatColorLine(pageKey, sel)
+          lineTotal,
+          colorLine: formatColorLine(pageKey, sel),
+          letters: pageKey === 'letter' ? sel.letters : null
         });
       }
     });
@@ -598,6 +765,14 @@ function buildReceiptPdf(site, orderId, orderDate, customer, items, totals) {
   if (customer.notes) { doc.text(`Notes: ${customer.notes}`, left, y); y += 14; }
   y += 14;
  
+  const pageBottom = 800;
+  function ensureSpace(needed) {
+    if (y + needed > pageBottom) {
+      doc.addPage();
+      y = 50;
+    }
+  }
+
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
   doc.text('Items', left, y);
@@ -605,14 +780,16 @@ function buildReceiptPdf(site, orderId, orderDate, customer, items, totals) {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   items.forEach(it => {
+    ensureSpace(20);
     doc.text(`${it.qty} x ${it.name} (${it.unit})`, left, y);
     doc.text(formatMoney(it.lineTotal, symbol), right, y, { align: 'right' });
     y += 14;
-    if (it.colorLine) {
+    if (!it.letters && it.colorLine) {
       doc.setFontSize(9);
       it.colorLine.split('\n').forEach(line => {
         const wrapped = doc.splitTextToSize(`* ${line}`, right - left - 10);
         wrapped.forEach(wLine => {
+          ensureSpace(12);
           doc.text(wLine, left + 10, y);
           y += 12;
         });
@@ -620,12 +797,55 @@ function buildReceiptPdf(site, orderId, orderDate, customer, items, totals) {
       doc.setFontSize(10);
     }
   });
+
+  const allLetters = items.filter(it => it.letters && it.letters.length).flatMap(it => it.letters);
+  if (allLetters.length) {
+    y += 10;
+    ensureSpace(24);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('Letters to Write', left, y);
+    y += 18;
+
+    const multi = allLetters.length > 1;
+    allLetters.forEach((l, i) => {
+      ensureSpace(60);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10.5);
+      doc.text(multi ? `Letter ${i + 1}` : 'Letter', left, y);
+      y += 14;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9.5);
+      doc.text(`Border: ${l.border}      Size: ${l.size} (${l.sizeDimensions}) - ${formatMoney(l.sizePrice || 0, symbol)}`, left, y);
+      y += 13;
+      doc.text(`To: ${l.to}      From: ${l.from}`, left, y);
+      y += 16;
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9.5);
+      doc.text('Message:', left, y);
+      y += 14;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(12);
+      const wrapped = doc.splitTextToSize(l.message, right - left - 16);
+      wrapped.forEach(wLine => {
+        ensureSpace(17);
+        doc.text(wLine, left + 8, y);
+        y += 17;
+      });
+      y += 12;
+    });
+  }
  
+  ensureSpace(30);
   y += 6;
   doc.setDrawColor(180, 106, 114);
   doc.line(left, y, right, y);
   y += 18;
  
+  ensureSpace(60);
   doc.setFontSize(10);
   doc.text('Subtotal', left, y);
   doc.text(formatMoney(totals.subtotal, symbol), right, y, { align: 'right' });
@@ -640,6 +860,7 @@ function buildReceiptPdf(site, orderId, orderDate, customer, items, totals) {
   doc.text(formatMoney(totals.total, symbol), right, y, { align: 'right' });
   y += 26;
  
+  ensureSpace(20);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.text('Payment method: Cash on delivery', left, y);
@@ -647,17 +868,56 @@ function buildReceiptPdf(site, orderId, orderDate, customer, items, totals) {
   return doc.output('datauristring').replace(/;filename=[^;]*/, '');
 }
  
+function buildLetterPreviewsHtml(letters, symbol) {
+  const multi = letters.length > 1;
+  return letters.map((l, i) => `
+    <div class="letter-preview-card">
+      ${l.borderImage ? `<img src="${l.borderImage}" alt="${escapeHtml(l.border)} border">` : ''}
+      <div class="letter-preview-body">
+        <div class="letter-preview-meta">
+          ${multi ? `<span><strong>Letter ${i + 1}</strong></span>` : ''}
+          <span>Border: <strong>${escapeHtml(l.border)}</strong></span>
+          <span>Size: <strong>${escapeHtml(l.size)}</strong> (${escapeHtml(l.sizeDimensions)}) &middot; ${formatMoney(l.sizePrice || 0, symbol)}</span>
+        </div>
+        <div class="letter-preview-tofrom">To ${escapeHtml(l.to)}, from ${escapeHtml(l.from)}</div>
+        <div class="letter-preview-message">${escapeHtml(l.message)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function buildLetterPreviewsPlainText(letters, symbol) {
+  const multi = letters.length > 1;
+  return letters.map((l, i) => {
+    const prefix = multi ? `Letter ${i + 1}\n` : '';
+    return `${prefix}Border: ${l.border}\nSize: ${l.size} (${l.sizeDimensions}) - ${formatMoney(l.sizePrice || 0, symbol)}\nTo: ${l.to}\nFrom: ${l.from}\nMessage:\n${l.message}`;
+  }).join('\n\n');
+}
+
 function buildItemsHtml(items, symbol) {
   return items.map(it => `
     <tr>
       <td style="padding:12px 0;border-bottom:1px solid #f0dde1;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#3a3128;vertical-align:top;">
         <div style="font-weight:600;">${it.qty} &times; ${escapeHtml(it.name)} <span style="font-weight:400;color:#8a7f74;">(${escapeHtml(it.unit)})</span></div>
-        ${it.colorLine ? it.colorLine.split('\n').map(line => `<div style="font-size:12.5px;font-style:italic;color:#8a7f74;margin-top:4px;">* ${escapeHtml(line)}</div>`).join('') : ''}
+        ${(!it.letters && it.colorLine) ? it.colorLine.split('\n').map(line => `<div style="font-size:12.5px;font-style:italic;color:#8a7f74;margin-top:4px;">* ${escapeHtml(line)}</div>`).join('') : ''}
       </td>
       <td style="padding:12px 0;border-bottom:1px solid #f0dde1;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#8f4d55;text-align:right;white-space:nowrap;vertical-align:top;">
         ${formatMoney(it.lineTotal, symbol)}
       </td>
     </tr>
+  `).join('');
+}
+
+function buildLetterPreviewsEmailHtml(letters, symbol) {
+  const multi = letters.length > 1;
+  return letters.map((l, i) => `
+    <div style="background:#FBE1E7;border-radius:10px;padding:16px 18px;margin:0 0 14px 0;font-family:Helvetica,Arial,sans-serif;">
+      <div style="font-size:12.5px;color:#8f4d55;margin-bottom:8px;">
+        ${multi ? `<strong>Letter ${i + 1}</strong> &middot; ` : ''}Border: <strong>${escapeHtml(l.border)}</strong> &middot; Size: <strong>${escapeHtml(l.size)}</strong> (${escapeHtml(l.sizeDimensions)}) &middot; ${formatMoney(l.sizePrice || 0, symbol)}
+      </div>
+      <div style="font-size:15px;color:#2D3A47;margin-bottom:8px;">To ${escapeHtml(l.to)}, from ${escapeHtml(l.from)}</div>
+      <div style="font-size:16px;line-height:1.7;color:#3a3128;background:#FFF7E6;border-radius:8px;padding:12px 14px;white-space:pre-wrap;">${escapeHtml(l.message)}</div>
+    </div>
   `).join('');
 }
 
@@ -669,12 +929,16 @@ function sendOrderEmails(pageData, site, orderId, orderDate, customer, items, to
   const itemsText = items
     .map(it => {
       const base = `${it.qty} x ${it.name} (${formatMoney(it.price, symbol)} per ${it.unit}) = ${formatMoney(it.lineTotal, symbol)}`;
-      const colorPart = it.colorLine ? it.colorLine.split('\n').map(line => `\n   * ${line}`).join('') : '';
+      const colorPart = (!it.letters && it.colorLine) ? it.colorLine.split('\n').map(line => `\n   * ${line}`).join('') : '';
       return base + colorPart;
     })
     .join('\n');
 
   const itemsHtml = buildItemsHtml(items, symbol);
+
+  const allLetters = items.filter(it => it.letters && it.letters.length).flatMap(it => it.letters);
+  const lettersText = allLetters.length ? buildLetterPreviewsPlainText(allLetters, symbol) : '';
+  const lettersHtml = allLetters.length ? buildLetterPreviewsEmailHtml(allLetters, symbol) : '';
  
   const templateParams = {
     order_id: orderId,
@@ -689,6 +953,9 @@ function sendOrderEmails(pageData, site, orderId, orderDate, customer, items, to
     has_email: customer.email ? 'yes' : '',
     items_text: itemsText,
     items_html: itemsHtml,
+    has_letters: allLetters.length ? 'yes' : '',
+    letters_text: lettersText,
+    letters_html: lettersHtml,
     subtotal: formatMoney(totals.subtotal, symbol),
     delivery_fee: formatMoney(totals.deliveryFee, symbol),
     total: formatMoney(totals.total, symbol)
@@ -770,8 +1037,21 @@ function showReceipt(pageData, site, orderId, orderDate, customer, items, totals
       <span>${it.qty} x ${it.name} (${it.unit})</span>
       <span>${formatMoney(it.lineTotal, symbol)}</span>
     </div>
-    ${it.colorLine ? it.colorLine.split('\n').map(line => `<div class="receipt-line-sub">* ${escapeHtml(line)}</div>`).join('') : ''}
+    ${(!it.letters && it.colorLine) ? it.colorLine.split('\n').map(line => `<div class="receipt-line-sub">* ${escapeHtml(line)}</div>`).join('') : ''}
   `).join('');
+
+  const lettersSection = document.getElementById('receipt-letters-section');
+  const lettersEl = document.getElementById('receipt-letters');
+  const allLetters = items.filter(it => it.letters && it.letters.length).flatMap(it => it.letters);
+  if (lettersSection && lettersEl) {
+    if (allLetters.length) {
+      lettersEl.innerHTML = buildLetterPreviewsHtml(allLetters, symbol);
+      lettersSection.style.display = '';
+    } else {
+      lettersEl.innerHTML = '';
+      lettersSection.style.display = 'none';
+    }
+  }
  
   document.getElementById('receipt-subtotal').textContent = formatMoney(totals.subtotal, symbol);
   document.getElementById('receipt-delivery').textContent = formatMoney(totals.deliveryFee, symbol);
