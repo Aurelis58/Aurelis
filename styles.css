@@ -37,7 +37,7 @@ img,svg{display:block; max-width:100%;}
 .ribbon-underline{
   display:block;
   width:150px;
-  height:14px;
+  height:20px;
   margin:14px auto 0;
 }
 .ribbon-underline path{stroke:var(--rosewood); stroke-width:3; fill:none; stroke-linecap:round;}
@@ -202,12 +202,6 @@ section{padding:90px 0;}
 .product-info h3{font-size:17px; margin-top:6px; font-weight:500;}
 .price-row{display:flex; align-items:center; justify-content:space-between; margin-top:12px;}
 .price{font-family:'Fraunces',serif; font-size:18px; color:var(--midnight);}
-.add-btn{
-  width:34px; height:34px; border-radius:50%; background:var(--sage);
-  display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background-color .2s ease;
-}
-.add-btn:hover{background:var(--sage-deep);}
-.add-btn svg{width:15px; height:15px; stroke:var(--cream);}
 
 /* =================== PROMO BANNER =================== */
 .promo{background:var(--sage); position:relative; overflow:hidden;}

@@ -36,27 +36,27 @@
   "hero": {
     "slides": [
       {
-        "eyebrow": "Crochet Collection",
-        "heading": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        "body": "Duis ornare, mauris sed rutrum hendrerit, magna quam euismod sapien, nec finibus nulla lorem at enim.",
+        "eyebrow": "Handcrafted Crochet",
+        "heading": "Made by hand, made for you.",
+        "body": "Thoughtfully handcrafted crochet pieces, designed to bring a little charm to your everyday moments.",
         "ctaText": "Shop Crochet",
         "ctaHref": "order-crochet.html",
         "image": "images/hero-crochet.jpg",
         "imageAlt": "Handmade crochet bags and wearables"
       },
       {
-        "eyebrow": "Ribbon Bar",
-        "heading": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        "body": "Duis ornare, mauris sed rutrum hendrerit, magna quam euismod sapien, nec finibus nulla lorem at enim.",
+        "eyebrow": "Ribbon Flower",
+        "heading": "A little bloom that lasts.",
+        "body": "Handcrafted ribbon bouquets and keepsakes, made to celebrate the people and moments that matter.",
         "ctaText": "Shop Ribbon",
         "ctaHref": "order-ribbon.html",
-        "image": "/assets/images/mini-bouquet-samples.JPG",
+        "image": "assets/images/mini_bouquet_samples.webp",
         "imageAlt": "Assorted ribbon rolls"
       },
       {
-        "eyebrow": "Custom Orders",
-        "heading": "Made to Your Size, Color and Budget",
-        "body": "Duis ornare, mauris sed rutrum hendrerit, magna quam euismod sapien, nec finibus nulla lorem at enim.",
+        "eyebrow": "Personalized Letters",
+        "heading": "Make it personal, make it yours.",
+        "body": "Create a one-of-a-kind keepsake with handcrafted letters made especially for you.",
         "ctaText": "Shop Letter",
         "ctaHref": "order-letter.html",
         "image": "images/hero-custom.jpg",
@@ -89,7 +89,7 @@
   "categories": [
     {
       "name": "Crochet",
-      "icon": "crochet",
+      "icon": "giftset",
       "href": "order-crochet.html"
     },
     {
@@ -113,7 +113,7 @@
       "category": "Ribbons",
       "name": "Mini Bouquet Keychain",
       "price": "QAR 15.00",
-      "image": "/assets/images/mini-bouquet-samples.JPG",
+      "image": "assets/images/mini_bouquet_samples.webp",
       "imageAlt": "Mini Bouquet Keychain"
     },
     {

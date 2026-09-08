@@ -1,6 +1,6 @@
 const ICONS = {
   crochet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="9" r="5"/><path d="M13 13l7 7"/></svg>',
-  ribbon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 8c8-6 16 6 8 6-8 0-4-12 8-6"/></svg>',
+  ribbon: '<svg width="52px" height="52px" viewBox="0 0 1.56 1.56" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.26 0.325v0.948c0 0.058 0.07 0.087 0.111 0.046L0.78 0.91l0.409 0.409c0.041 0.041 0.111 0.012 0.111 -0.046V0.325a0.13 0.13 0 0 0 -0.13 -0.13H0.39a0.13 0.13 0 0 0 -0.13 0.13" stroke="#b46a72" stroke-width="0.13" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   letter: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 6l9 7 9-7"/></svg>',
   wallart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 15l3-4 2 3 3-4 3 5"/></svg>',
   giftsets: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v18M4 8l8-5 8 5M4 16l8 5 8-5"/></svg>',
