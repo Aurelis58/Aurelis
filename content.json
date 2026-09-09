@@ -339,39 +339,39 @@
     "privacyPolicy": {
       "title": "Privacy Policy | Aurelis",
       "heading": "Privacy Policy",
-      "effectiveDate": "Effective date: [Month Day, Year]",
+      "effectiveDate": "Effective date: September 9, 2026",
       "sections": [
         {
           "heading": "Overview",
-          "body": "This page describes how Aurelis collects, uses and protects the personal information of people who visit this website or place an order with us."
+          "body": "This page describes how Aurelis collects, uses and protects the personal information of people who visit this website or place an order with us. Aurelis is based in Qatar, and we handle personal data in line with Qatar's Personal Data Privacy Protection Law (Law No. 13 of 2016)."
         },
         {
           "heading": "Information We Collect",
-          "body": "When you place an order or contact us, we may collect your name, email address, shipping address, phone number and order details. Payment card details are collected and processed directly by our third party payment processor and are not stored on our servers. We may also collect basic browser and device information through cookies and analytics tools."
+          "body": "When you place an order, we collect your name, phone number, delivery address, order details (including any customization choices, and the recipient/sender names and message text you write for personalized letters), and, if you choose to provide it, your email address and order notes. We do not collect or store any payment card details, since all orders are paid in cash on delivery."
         },
         {
           "heading": "How We Use Your Information",
-          "body": "We use the information we collect to process and ship your order, respond to customer service requests, send order updates, send marketing emails if you have opted in, and improve the content and performance of this website."
+          "body": "We use the information we collect only to confirm, prepare, and deliver your order, contact you about your order by phone or email, and respond to questions you send us. We do not use your information for marketing unless you separately ask us to."
         },
         {
-          "heading": "Cookies",
-          "body": "This website uses cookies to keep items in your shopping cart and to understand how visitors use the site. You can disable cookies through your browser settings, though some parts of the site may not function correctly without them."
+          "heading": "Cookies and Website Analytics",
+          "body": "This website does not currently use cookies, and we do not run any analytics or advertising tracking on it. Loading this site does make a request to Google Fonts to display our website fonts, which may share your device's IP address with Google as part of that request. If we introduce cookies or analytics tools in the future, we will update this policy and, where required, ask for your consent first."
         },
         {
           "heading": "Sharing Your Information",
-          "body": "We share order information with shipping carriers and payment processors only to the extent necessary to fulfil and process your order. We do not sell your personal information to third parties."
+          "body": "We use EmailJS, a third-party email delivery service, to send order confirmations; your order and contact details pass through EmailJS's systems for this purpose only. We do not sell your personal information, and we do not share it with anyone else except where needed to fulfil your order (for example, a delivery courier) or where required by Qatari law."
         },
         {
           "heading": "Data Retention",
-          "body": "We retain order and customer records for as long as needed to meet accounting, tax and legal obligations."
+          "body": "We keep order and customer records for as long as needed to fulfil your order and to meet our accounting and legal obligations, and delete them when they are no longer needed for those purposes."
         },
         {
           "heading": "Your Rights",
-          "body": "You may request access to, correction of, or deletion of the personal information we hold about you by contacting us at [contact email]."
+          "body": "Under Qatar's Personal Data Privacy Protection Law, you may request access to, correction of, or deletion of the personal information we hold about you by contacting us at aurelis2058@gmail.com."
         },
         {
           "heading": "Children's Privacy",
-          "body": "This website is not directed at children under the age of 13, and we do not knowingly collect personal information from children."
+          "body": "This website is not directed at children, and we do not knowingly collect personal information from children."
         },
         {
           "heading": "Changes to This Policy",
@@ -379,14 +379,14 @@
         },
         {
           "heading": "Contact Us",
-          "body": "If you have questions about this policy, please contact us at [contact email]."
+          "body": "If you have questions about this policy, please contact us at aurelis2058@gmail.com."
         }
       ]
     },
     "termsConditions": {
       "title": "Terms and Conditions | Aurelis",
       "heading": "Terms and Conditions",
-      "effectiveDate": "Effective date: [Month Day, Year]",
+      "effectiveDate": "Effective date: September 9, 2026",
       "sections": [
         {
           "heading": "Overview",
@@ -398,19 +398,19 @@
         },
         {
           "heading": "Custom Orders",
-          "body": "Custom and made to order items are final sale unless the item arrives defective or damaged. Production timelines are estimates and are not guaranteed."
+          "body": "Custom and made to order items, including personalized letters and custom color combinations, are final sale and cannot be returned or exchanged unless the item arrives defective or damaged. Production timelines are estimates and are not guaranteed."
         },
         {
           "heading": "Pricing and Payment",
-          "body": "All prices are listed in [currency]. Payment is due in full at the time of ordering. We reserve the right to correct any pricing errors shown on the site."
+          "body": "All prices are listed in Qatari Riyals (QAR). Payment is cash on delivery, collected when your order is handed to you. We reserve the right to correct any pricing errors shown on the site, and will confirm final pricing with you by phone before your order ships."
         },
         {
-          "heading": "Shipping",
-          "body": "Estimated shipping timelines and costs are shown at checkout. Once an order has been handed to the shipping carrier, Aurelis is not responsible for delays caused by the carrier."
+          "heading": "Order Confirmation and Delivery",
+          "body": "After you submit an order, we will contact you by phone to confirm the details and give you an estimated delivery date. Delivery is currently by local meet-up within Qatar; no shipping carrier is used. Aurelis is not responsible for delays caused by circumstances outside our control."
         },
         {
           "heading": "Returns and Exchanges",
-          "body": "Please see our Returns page for details on which items are eligible for return or exchange. Custom and made to order items are not eligible for return unless defective."
+          "body": "Ready-made items may be returned or exchanged within 3 days of delivery if unused and in their original condition; contact us at aurelis2058@gmail.com to arrange this. Custom and made-to-order items (see 'Custom Orders' above) are not eligible for return or exchange unless defective or damaged on arrival."
         },
         {
           "heading": "Intellectual Property",
@@ -422,7 +422,7 @@
         },
         {
           "heading": "Governing Law",
-          "body": "These terms are governed by the laws of [State or Country]."
+          "body": "These terms are governed by the laws of the State of Qatar."
         },
         {
           "heading": "Changes to These Terms",
@@ -430,7 +430,7 @@
         },
         {
           "heading": "Contact Us",
-          "body": "If you have questions about these terms, please contact us at [contact email]."
+          "body": "If you have questions about these terms, please contact us at aurelis2058@gmail.com."
         }
       ]
     }
