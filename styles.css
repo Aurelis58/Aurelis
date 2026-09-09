@@ -169,10 +169,10 @@ section{padding:90px 0;}
 
 /* =================== CATEGORIES =================== */
 .categories{background:var(--cream);}
-.cat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:28px;}
-.cat-card{text-align:center; cursor:pointer;}
+.cat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(12px,4vw,28px);}
+.cat-card{text-align:center; cursor:pointer; min-width:0;}
 .cat-circle{
-  width:130px; height:130px; border-radius:50%; margin:0 auto 18px;
+  width:100%; max-width:130px; aspect-ratio:1/1; border-radius:50%; margin:0 auto 18px;
   display:flex; align-items:center; justify-content:center;
   border:2px dashed var(--rosewood); padding:6px;
   transition:transform .25s ease;
@@ -182,8 +182,8 @@ section{padding:90px 0;}
   width:100%; height:100%; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
 }
-.cat-circle-inner svg{width:52px; height:52px;}
-.cat-card h3{font-size:16px; font-weight:500;}
+.cat-circle-inner svg{width:40%; height:40%; max-width:52px; max-height:52px;}
+.cat-card h3{font-size:clamp(13px,3.6vw,16px); font-weight:500;}
 
 /* =================== PRODUCT GRID =================== */
 .products{background:var(--blush-soft); position:relative;}
