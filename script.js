@@ -126,6 +126,33 @@ function renderLegalSections(page) {
   `).join('');
 }
  
+/* ---------------- mobile nav ---------------- */
+function initMobileNav() {
+  const toggle = document.getElementById('navToggle');
+  const nav = document.querySelector('nav.links');
+  if (!toggle || !nav) return;
+
+  function closeMenu() {
+    nav.classList.remove('open');
+    toggle.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+
+  toggle.addEventListener('click', () => {
+    const isOpen = nav.classList.toggle('open');
+    toggle.classList.toggle('open', isOpen);
+    toggle.setAttribute('aria-expanded', String(isOpen));
+  });
+
+  nav.addEventListener('click', e => {
+    if (e.target.tagName === 'A') closeMenu();
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) closeMenu();
+  });
+}
+
 /* ---------------- hero carousel ---------------- */
 let current = 0;
 const totalSlides = 3;
@@ -1064,6 +1091,7 @@ function showReceipt(pageData, site, orderId, orderDate, customer, items, totals
  
 /* ---------------- boot ---------------- */
 document.addEventListener('DOMContentLoaded', () => {
+  initMobileNav();
   fetch('content.json')
     .then(res => res.json())
     .then(data => {
@@ -1106,6 +1134,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.title = data.orderPages.letter.pageTitle;
         bindText(document, { order: data.orderPages.letter });
         renderOrderPage('letter', data.orderPages.letter, data.site, data.colorOptions);
+      }
+      if (page === '404') {
+        document.title = `Page Not Found | ${data.site.brandName}`;
       }
  
       if (document.getElementById('slides')) {
