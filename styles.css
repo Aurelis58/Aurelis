@@ -76,7 +76,7 @@ nav.links a:hover::after{width:100%;}
   padding:0; flex-shrink:0;
 }
 .nav-toggle span{
-  display:block; width:100%; height:2px; background:var(--midnight);
+  display:block; width:100%; height:3px; background:var(--midnight);
   border-radius:2px; transition:transform .25s ease, opacity .25s ease;
 }
 .nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
@@ -136,21 +136,33 @@ nav.links a:hover::after{width:100%;}
   position:absolute; bottom:30px; left:50%; transform:translateX(-50%);
   display:flex; gap:14px; z-index:5;
 }
-.dot{width:26px; height:14px; cursor:pointer; opacity:0.4; transition:opacity .25s ease;}
+.dot{width:26px; height:14px; padding:0; border:none; background:none; cursor:pointer; opacity:0.4; transition:opacity .25s ease;}
 .dot.active{opacity:1;}
-.dot svg{width:100%; height:100%;}
+.dot svg{width:100%; height:100%; display:block;}
+.dot:focus-visible{outline:2px solid var(--rosewood); outline-offset:3px;}
 
 .hero-nav-btn{
   position:absolute; top:50%; transform:translateY(-50%);
-  width:44px; height:44px; border-radius:50%;
+  width:44px; height:44px; border-radius:50%; padding:0; font:inherit;
   background:rgba(255,247,230,0.7); border:1px solid rgba(45,58,71,0.2);
   display:flex; align-items:center; justify-content:center; cursor:pointer;
   z-index:5; transition:background-color .2s ease;
 }
 .hero-nav-btn:hover{background:rgba(255,247,230,0.95);}
+.hero-nav-btn:focus-visible{outline:2px solid var(--midnight); outline-offset:3px;}
 .hero-nav-btn.prev{left:24px;}
 .hero-nav-btn.next{right:24px;}
 .hero-nav-btn svg{width:16px; height:16px;}
+
+.add-btn{
+  width:32px; height:32px; flex-shrink:0; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--blush-soft); color:var(--rosewood-deep);
+  transition:background-color .2s ease, color .2s ease;
+}
+.add-btn:hover{background:var(--rosewood); color:var(--cream);}
+.add-btn:focus-visible{outline:2px solid var(--rosewood); outline-offset:2px;}
+.add-btn svg{width:16px; height:16px; stroke:currentColor;}
 
 /* =================== TRUST STRIP =================== */
 .trust{
@@ -254,7 +266,7 @@ footer{background:var(--midnight); border-top:1px solid rgba(255,247,230,0.12); 
 .foot-col a:hover{color:var(--blush);}
 .foot-bottom{
   border-top:1px solid rgba(255,247,230,0.12); padding:22px 0; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
-  font-size:12.5px; color:rgba(255,247,230,0.45);
+  font-size:12.5px; color:rgba(255,247,230,0.65);
 }
 .foot-legal a{color:rgba(255,247,230,0.6); margin-left:14px; transition:color .2s ease;}
 .foot-legal a:first-child{margin-left:0;}

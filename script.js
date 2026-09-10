@@ -77,9 +77,13 @@ function renderCategories(items) {
   `).join('');
 }
  
-function renderProducts(items) {
+function renderProducts(items, categories) {
   const el = document.querySelector('[data-list="products"]');
   if (!el) return;
+  const hrefForCategory = (catName) => {
+    const cat = (categories || []).find(c => c.name === catName);
+    return cat ? cat.href : '#shop';
+  };
   el.innerHTML = items.map(p => `
     <div class="product-card">
       ${p.tag ? `<span class="tag">${p.tag}</span>` : ''}
@@ -91,7 +95,9 @@ function renderProducts(items) {
         <h3>${p.name}</h3>
         <div class="price-row">
           <span class="price">${p.price}</span>
-          <div class="add-btn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+          <a class="add-btn" href="${hrefForCategory(p.category)}" aria-label="Order ${p.name}">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          </a>
         </div>
       </div>
     </div>
@@ -163,7 +169,17 @@ function renderSlide() {
   const dots = document.querySelectorAll('.dot');
   if (!slidesEl) return;
   slidesEl.style.transform = `translateX(-${current * 100}%)`;
-  dots.forEach((d, i) => d.classList.toggle('active', i === current));
+  dots.forEach((d, i) => {
+    d.classList.toggle('active', i === current);
+    d.setAttribute('aria-current', i === current ? 'true' : 'false');
+  });
+  // Keep off-screen slides out of the accessibility tree and tab order so
+  // screen reader / keyboard users don't hit duplicate headings and hidden links.
+  slidesEl.querySelectorAll('.slide').forEach((slide, i) => {
+    const isActive = i === current;
+    slide.toggleAttribute('inert', !isActive);
+    slide.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+  });
 }
 function moveSlide(dir) {
   current = (current + dir + totalSlides) % totalSlides;
@@ -181,6 +197,15 @@ function resetAutoplay() {
 }
 window.moveSlide = moveSlide;
 window.goToSlide = goToSlide;
+
+function initHeroAutoplayPause() {
+  const hero = document.querySelector('.hero');
+  if (!hero) return;
+  hero.addEventListener('mouseenter', () => clearInterval(autoplayTimer));
+  hero.addEventListener('mouseleave', resetAutoplay);
+  hero.addEventListener('focusin', () => clearInterval(autoplayTimer));
+  hero.addEventListener('focusout', resetAutoplay);
+}
  
 /* ---------------- order forms (crochet / ribbon) ---------------- */
 function formatMoney(amount, symbol) {
@@ -208,7 +233,7 @@ function buildBorderSwatches(borderDesigns, groupName) {
     <label class="border-swatch">
       <input type="radio" name="${groupName}" value="${escapeHtml(b.name)}">
       <span class="border-swatch-card">
-        <img src="${b.image}" alt="${escapeHtml(b.name)}" loading="lazy">
+        <img src="${b.image}" alt="${escapeHtml(b.name)}" loading="lazy" onerror="this.style.display='none'">
         <span class="border-swatch-name">${escapeHtml(b.name)}</span>
       </span>
     </label>
@@ -899,7 +924,7 @@ function buildLetterPreviewsHtml(letters, symbol) {
   const multi = letters.length > 1;
   return letters.map((l, i) => `
     <div class="letter-preview-card">
-      ${l.borderImage ? `<img src="${l.borderImage}" alt="${escapeHtml(l.border)} border">` : ''}
+      ${l.borderImage ? `<img src="${l.borderImage}" alt="${escapeHtml(l.border)} border" loading="lazy" onerror="this.style.display='none'">` : ''}
       <div class="letter-preview-body">
         <div class="letter-preview-meta">
           ${multi ? `<span><strong>Letter ${i + 1}</strong></span>` : ''}
@@ -1061,7 +1086,7 @@ function showReceipt(pageData, site, orderId, orderDate, customer, items, totals
   const linesEl = document.getElementById('receipt-lines');
   linesEl.innerHTML = items.map(it => `
     <div class="receipt-line">
-      <span>${it.qty} x ${it.name} (${it.unit})</span>
+      <span>${it.qty} x ${escapeHtml(it.name)} (${escapeHtml(it.unit)})</span>
       <span>${formatMoney(it.lineTotal, symbol)}</span>
     </div>
     ${(!it.letters && it.colorLine) ? it.colorLine.split('\n').map(line => `<div class="receipt-line-sub">* ${escapeHtml(line)}</div>`).join('') : ''}
@@ -1105,7 +1130,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (data.nav) renderNav(data.nav.links);
       if (data.trust) renderTrust(data.trust);
       if (data.categories) renderCategories(data.categories);
-      if (data.products) renderProducts(data.products);
+      if (data.products) renderProducts(data.products, data.categories);
       if (data.footer) {
         renderFooterColumns(data.footer.columns);
         renderLegalLinks(data.footer.legalLinks);
@@ -1142,6 +1167,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (document.getElementById('slides')) {
         renderSlide();
         resetAutoplay();
+        initHeroAutoplayPause();
       }
     })
     .catch(err => {

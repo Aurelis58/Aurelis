@@ -41,7 +41,7 @@
         "body": "Thoughtfully handcrafted crochet pieces, designed to bring a little charm to your everyday moments.",
         "ctaText": "Shop Crochet",
         "ctaHref": "order-crochet.html",
-        "image": "images/hero-crochet.jpg",
+        "image": "assets/images/heart_crochet_red.webp",
         "imageAlt": "Handmade crochet bags and wearables"
       },
       {
@@ -121,7 +121,7 @@
       "category": "Crochet",
       "name": "Butterfly",
       "price": "QAR 15.00",
-      "image": "images/product-hoop.jpg",
+      "image": "assets/images/butterfly_crochet.webp",
       "imageAlt": "Butterfly"
     },
     {
@@ -129,14 +129,14 @@
       "category": "Crochet",
       "name": "Heart with Ribbon",
       "price": "QAR 12.00",
-      "image": "images/product-ribbon.jpg",
+      "image": "assets/images/heart_crochet_pink.webp",
       "imageAlt": "Heart with Ribbon"
     },
     {
       "tag": "",
       "category": "Letters",
       "name": "Handwritten Letter",
-      "price": "QAR 20.00",
+      "price": "QAR 8.00 - QAR 15.00",
       "image": "images/product-letter.jpg",
       "imageAlt": "Handwritten Letter with decorative border"
     }
