@@ -18,6 +18,130 @@ const TRUST_ICONS = [
 function getPath(obj, path) {
   return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), obj);
 }
+
+/* ---------------- basket storage (localStorage) ---------------- */
+const BASKET_KEY = 'aurelis_basket_v1';
+const CATEGORY_LABELS = { crochet: 'Crochet', ribbon: 'Ribbon', letter: 'Letter' };
+
+function categoryLabel(key) {
+  return CATEGORY_LABELS[key] || key || '';
+}
+
+function getBasket() {
+  try {
+    const raw = localStorage.getItem(BASKET_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveBasket(items) {
+  try {
+    localStorage.setItem(BASKET_KEY, JSON.stringify(items));
+  } catch (e) {
+    console.error('Could not save basket', e);
+  }
+  updateBasketBadge();
+}
+
+function addItemsToBasket(newItems) {
+  const basket = getBasket();
+  newItems.forEach(it => {
+    const id = 'itm_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+    basket.push({ id, ...it });
+  });
+  saveBasket(basket);
+}
+
+function removeBasketItem(id) {
+  saveBasket(getBasket().filter(it => it.id !== id));
+}
+
+function clearBasket() {
+  saveBasket([]);
+}
+
+function updateBasketBadge() {
+  const count = getBasket().reduce((sum, it) => sum + (it.qty || 1), 0);
+  document.querySelectorAll('[data-role="basket-count"]').forEach(el => {
+    el.textContent = String(count);
+    el.style.display = count > 0 ? 'flex' : 'none';
+  });
+}
+
+/* ---------------- favorites storage (localStorage) ---------------- */
+const FAVORITES_KEY = 'aurelis_favorites_v1';
+
+function favoriteIdFor(p) {
+  return `${p.category || ''}::${p.name || ''}`;
+}
+
+function getFavorites() {
+  try {
+    const raw = localStorage.getItem(FAVORITES_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveFavorites(ids) {
+  try {
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(ids));
+  } catch (e) {
+    console.error('Could not save favorites', e);
+  }
+  updateFavoritesBadge();
+}
+
+function isFavorite(id) {
+  return getFavorites().includes(id);
+}
+
+function toggleFavorite(id) {
+  const favs = getFavorites();
+  const idx = favs.indexOf(id);
+  if (idx === -1) {
+    favs.push(id);
+  } else {
+    favs.splice(idx, 1);
+  }
+  saveFavorites(favs);
+  return idx === -1; // true if it just became a favorite
+}
+
+function updateFavoritesBadge() {
+  const count = getFavorites().length;
+  document.querySelectorAll('[data-role="favorites-count"]').forEach(el => {
+    el.textContent = String(count);
+    el.style.display = count > 0 ? 'flex' : 'none';
+  });
+}
+
+function initFavoriteButtons(root) {
+  const scope = root || document;
+  scope.querySelectorAll('.heart[data-fav-id]').forEach(btn => {
+    const fav = isFavorite(btn.getAttribute('data-fav-id'));
+    btn.classList.toggle('active', fav);
+    btn.setAttribute('aria-pressed', String(fav));
+  });
+}
+
+/* delegated heart-click handler shared by the homepage grid and the favorites page */
+function bindFavoriteClicks(el, onToggle) {
+  el.addEventListener('click', e => {
+    const heartBtn = e.target.closest('.heart[data-fav-id]');
+    if (!heartBtn) return;
+    e.preventDefault();
+    const nowFav = toggleFavorite(heartBtn.getAttribute('data-fav-id'));
+    heartBtn.classList.toggle('active', nowFav);
+    heartBtn.setAttribute('aria-pressed', String(nowFav));
+    if (onToggle) onToggle(nowFav, heartBtn);
+  });
+}
  
 function iconFor(key) {
   return ICONS[key] || ICONS.fallback;
@@ -77,31 +201,71 @@ function renderCategories(items) {
   `).join('');
 }
  
-function renderProducts(items, categories) {
-  const el = document.querySelector('[data-list="products"]');
-  if (!el) return;
-  const hrefForCategory = (catName) => {
-    const cat = (categories || []).find(c => c.name === catName);
-    return cat ? cat.href : '#shop';
-  };
-  el.innerHTML = items.map(p => `
-    <div class="product-card">
+function hrefForCategoryIn(categories, catName) {
+  const cat = (categories || []).find(c => c.name === catName);
+  return cat ? cat.href : '#shop';
+}
+
+function buildProductCardHtml(p, categories) {
+  return `
+    <div class="product-card" data-category="${escapeHtml(p.category || '')}">
       ${p.tag ? `<span class="tag">${p.tag}</span>` : ''}
       <div class="product-photo">
         <img src="${p.image}" alt="${p.imageAlt || p.name}" loading="lazy">
+        <button type="button" class="heart" data-fav-id="${escapeHtml(favoriteIdFor(p))}" aria-label="Save ${escapeHtml(p.name)} to favorites" aria-pressed="false">
+          <svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M12 20.5s-7.5-4.6-10-9.3C.4 8 1.6 4.3 5 3.2c2.3-.7 4.5.2 6 2.2 1.5-2 3.7-2.9 6-2.2 3.4 1.1 4.6 4.8 3 8-2.5 4.7-10 9.3-10 9.3z"/></svg>
+        </button>
       </div>
       <div class="product-info">
         <span class="cat-label">${p.category}</span>
         <h3>${p.name}</h3>
         <div class="price-row">
           <span class="price">${p.price}</span>
-          <a class="add-btn" href="${hrefForCategory(p.category)}" aria-label="Order ${p.name}">
+          <a class="add-btn" href="${hrefForCategoryIn(categories, p.category)}" aria-label="Order ${p.name}">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
           </a>
         </div>
       </div>
     </div>
-  `).join('');
+  `;
+}
+
+function renderProducts(items, categories) {
+  const el = document.querySelector('[data-list="products"]');
+  if (!el) return;
+  el.innerHTML = items.map(p => buildProductCardHtml(p, categories)).join('');
+  initFavoriteButtons(el);
+  bindFavoriteClicks(el);
+}
+
+/* ---------------- favorites page ---------------- */
+function renderFavoritesPage(products, categories) {
+  const el = document.querySelector('[data-list="favorite-items"]');
+  const emptyEl = document.getElementById('favorites-empty');
+  if (!el) return;
+
+  function draw() {
+    const favIds = getFavorites();
+    const list = (products || []).filter(p => favIds.includes(favoriteIdFor(p)));
+    if (!list.length) {
+      el.innerHTML = '';
+      el.style.display = 'none';
+      if (emptyEl) emptyEl.style.display = '';
+      return;
+    }
+    el.style.display = '';
+    if (emptyEl) emptyEl.style.display = 'none';
+    el.innerHTML = list.map(p => buildProductCardHtml(p, categories)).join('');
+    initFavoriteButtons(el);
+  }
+
+  draw();
+
+  bindFavoriteClicks(el, () => draw());
+
+  window.addEventListener('storage', e => {
+    if (e.key === FAVORITES_KEY) draw();
+  });
 }
  
 function renderFooterColumns(columns) {
@@ -159,54 +323,180 @@ function initMobileNav() {
   });
 }
 
-/* ---------------- hero carousel ---------------- */
-let current = 0;
-const totalSlides = 3;
-let autoplayTimer = null;
- 
-function renderSlide() {
-  const slidesEl = document.getElementById('slides');
-  const dots = document.querySelectorAll('.dot');
-  if (!slidesEl) return;
-  slidesEl.style.transform = `translateX(-${current * 100}%)`;
-  dots.forEach((d, i) => {
-    d.classList.toggle('active', i === current);
-    d.setAttribute('aria-current', i === current ? 'true' : 'false');
-  });
-  // Keep off-screen slides out of the accessibility tree and tab order so
-  // screen reader / keyboard users don't hit duplicate headings and hidden links.
-  slidesEl.querySelectorAll('.slide').forEach((slide, i) => {
-    const isActive = i === current;
-    slide.toggleAttribute('inert', !isActive);
-    slide.setAttribute('aria-hidden', isActive ? 'false' : 'true');
-  });
-}
-function moveSlide(dir) {
-  current = (current + dir + totalSlides) % totalSlides;
-  renderSlide();
-  resetAutoplay();
-}
-function goToSlide(i) {
-  current = i;
-  renderSlide();
-  resetAutoplay();
-}
-function resetAutoplay() {
-  clearInterval(autoplayTimer);
-  autoplayTimer = setInterval(() => moveSlide(1), 6000);
-}
-window.moveSlide = moveSlide;
-window.goToSlide = goToSlide;
+/* ---------------- nav icons: search / account / basket ---------------- */
+let currentSearchTerm = '';
+let currentCategoryFilter = '';
 
-function initHeroAutoplayPause() {
-  const hero = document.querySelector('.hero');
-  if (!hero) return;
-  hero.addEventListener('mouseenter', () => clearInterval(autoplayTimer));
-  hero.addEventListener('mouseleave', resetAutoplay);
-  hero.addEventListener('focusin', () => clearInterval(autoplayTimer));
-  hero.addEventListener('focusout', resetAutoplay);
+function applyProductFilters() {
+  const grid = document.querySelector('.product-grid');
+  if (!grid) return;
+  const q = currentSearchTerm.trim().toLowerCase();
+  let anyVisible = false;
+  grid.querySelectorAll('.product-card').forEach(card => {
+    const nameEl = card.querySelector('h3');
+    const name = nameEl ? nameEl.textContent.toLowerCase() : '';
+    const cardCategory = card.getAttribute('data-category') || '';
+    const matchesSearch = !q || name.includes(q);
+    const matchesCategory = !currentCategoryFilter || cardCategory === currentCategoryFilter;
+    const match = matchesSearch && matchesCategory;
+    card.style.display = match ? '' : 'none';
+    if (match) anyVisible = true;
+  });
+  let emptyMsg = grid.parentElement.querySelector('.search-empty');
+  if (!emptyMsg) {
+    emptyMsg = document.createElement('p');
+    emptyMsg.className = 'search-empty';
+    grid.insertAdjacentElement('afterend', emptyMsg);
+  }
+  emptyMsg.textContent = q ? 'No products match your search.' : 'No products in this category yet.';
+  emptyMsg.style.display = anyVisible ? 'none' : 'block';
 }
- 
+
+function filterProducts(term) {
+  currentSearchTerm = term || '';
+  applyProductFilters();
+}
+window.filterProducts = filterProducts;
+
+function initShopFilters(categories) {
+  const el = document.querySelector('[data-list="shop-filters"]');
+  if (!el) return;
+  const names = ['All', ...(categories || []).map(c => c.name)];
+  el.innerHTML = names.map((name, i) => `
+    <button type="button" class="filter-pill${i === 0 ? ' active' : ''}" data-category="${i === 0 ? '' : escapeHtml(name)}">${escapeHtml(name)}</button>
+  `).join('');
+
+  el.addEventListener('click', e => {
+    const btn = e.target.closest('.filter-pill');
+    if (!btn) return;
+    el.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCategoryFilter = btn.getAttribute('data-category') || '';
+    applyProductFilters();
+  });
+}
+
+/* ---------------- header search: auto-suggest as you type ---------------- */
+function ensureSuggestionsBox(wrap) {
+  let box = wrap.querySelector('.search-suggestions');
+  if (!box) {
+    box = document.createElement('div');
+    box.className = 'search-suggestions';
+    box.setAttribute('role', 'listbox');
+    wrap.appendChild(box);
+  }
+  return box;
+}
+
+function buildSuggestionItemHtml(p) {
+  return `
+    <button type="button" class="suggestion-item" role="option" data-name="${escapeHtml(p.name)}">
+      <img src="${p.image}" alt="" loading="lazy">
+      <span class="suggestion-info">
+        <span class="suggestion-name">${escapeHtml(p.name)}</span>
+        <span class="suggestion-meta">${escapeHtml(p.category || '')} &middot; ${escapeHtml(p.price || '')}</span>
+      </span>
+    </button>
+  `;
+}
+
+function initSearchAutocomplete(products) {
+  const input = document.getElementById('searchInput');
+  const wrap = document.getElementById('searchWrap');
+  if (!input || !wrap || !products || !products.length) return;
+
+  const box = ensureSuggestionsBox(wrap);
+
+  function renderSuggestions(term) {
+    const q = term.trim().toLowerCase();
+    if (!q) {
+      box.innerHTML = '';
+      box.classList.remove('show');
+      return;
+    }
+    const matches = products.filter(p => (p.name || '').toLowerCase().includes(q)).slice(0, 6);
+    if (!matches.length) {
+      box.innerHTML = `<div class="suggestion-empty">No matches for "${escapeHtml(term.trim())}".</div>`;
+      box.classList.add('show');
+      return;
+    }
+    box.innerHTML = matches.map(buildSuggestionItemHtml).join('');
+    box.classList.add('show');
+  }
+
+  function goToSuggestion(name) {
+    const grid = document.querySelector('.product-grid');
+    box.classList.remove('show');
+    if (grid) {
+      input.value = name;
+      filterProducts(name);
+      const card = Array.from(grid.querySelectorAll('.product-card')).find(c => {
+        const h3 = c.querySelector('h3');
+        return h3 && h3.textContent.trim() === name;
+      });
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      window.location.href = `shop.html?q=${encodeURIComponent(name)}`;
+    }
+  }
+
+  input.addEventListener('input', () => renderSuggestions(input.value));
+  input.addEventListener('focus', () => { if (input.value.trim()) renderSuggestions(input.value); });
+
+  box.addEventListener('click', e => {
+    const item = e.target.closest('.suggestion-item');
+    if (!item) return;
+    goToSuggestion(item.getAttribute('data-name'));
+  });
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      box.classList.remove('show');
+      return;
+    }
+    if (e.key === 'Enter' && input.value.trim()) {
+      e.preventDefault();
+      const grid = document.querySelector('.product-grid');
+      if (!grid) window.location.href = `shop.html?q=${encodeURIComponent(input.value.trim())}`;
+      else box.classList.remove('show');
+    }
+  });
+
+  document.addEventListener('click', e => {
+    if (!wrap.contains(e.target)) box.classList.remove('show');
+  });
+}
+
+function initNavIcons() {
+  const toggle = document.getElementById('searchToggle');
+  const wrap = document.getElementById('searchWrap');
+  const input = document.getElementById('searchInput');
+  if (!toggle || !wrap || !input) return;
+
+  toggle.addEventListener('click', () => {
+    const isOpen = wrap.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(isOpen));
+    if (isOpen) {
+      input.focus();
+    } else {
+      input.value = '';
+      filterProducts('');
+    }
+  });
+
+  input.addEventListener('input', () => filterProducts(input.value));
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      input.value = '';
+      filterProducts('');
+      wrap.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.focus();
+    }
+  });
+}
+
 /* ---------------- order forms (crochet / ribbon) ---------------- */
 function formatMoney(amount, symbol) {
   return `${symbol}${amount.toFixed(2)}`;
@@ -504,9 +794,12 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
     return `
     <div class="order-item-card" data-price="${p.price}" data-index="${i}">
       <div class="order-item">
-        <div>
-          <span class="order-item-name">${p.name}</span>
-          <span class="order-item-unit">${unitLabel}</span>
+        <div class="order-item-headline">
+          ${p.image ? `<img class="order-item-photo" src="${p.image}" alt="${escapeHtml(p.imageAlt || p.name)}" loading="lazy" onerror="this.style.display='none'">` : ''}
+          <div>
+            <span class="order-item-name">${p.name}</span>
+            <span class="order-item-unit">${unitLabel}</span>
+          </div>
         </div>
         <div class="order-item-price" data-role="line-total">${formatMoney(0, symbol)}</div>
         <div class="qty-control">
@@ -520,10 +813,6 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
   `;
   }).join('');
 
-  const deliveryFee = pageData.deliveryFee || 0;
-  const deliveryFeeEls = document.querySelectorAll('[data-role="delivery-fee"]');
-  deliveryFeeEls.forEach(el => el.textContent = formatMoney(deliveryFee, symbol));
- 
   function recalculate() {
     let subtotal = 0;
     itemsEl.querySelectorAll('.order-item-card').forEach(card => {
@@ -556,11 +845,9 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
       if (optionsEl) optionsEl.classList.toggle('show', qty > 0);
     });
     const hasItems = subtotal > 0;
-    const total = hasItems ? subtotal + deliveryFee : 0;
  
     document.querySelectorAll('[data-role="subtotal"]').forEach(el => el.textContent = formatMoney(subtotal, symbol));
-    document.querySelectorAll('[data-role="grand-total"]').forEach(el => el.textContent = formatMoney(total, symbol));
-    return { subtotal, deliveryFee, total, hasItems };
+    return { subtotal, hasItems };
   }
  
   itemsEl.addEventListener('click', e => {
@@ -608,29 +895,12 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
   form.addEventListener('submit', e => {
     e.preventDefault();
  
-    const nameField = document.getElementById('cust-name');
-    const phoneField = document.getElementById('cust-phone');
-    const addressField = document.getElementById('cust-address');
-    const emailField = document.getElementById('cust-email');
-    const notesField = document.getElementById('cust-notes');
-    const fields = [nameField, phoneField, addressField];
-    let valid = true;
- 
-    fields.forEach(f => {
-      const wrapper = f.closest('.form-field');
-      if (!f.value.trim()) {
-        wrapper.classList.add('invalid');
-        valid = false;
-      } else {
-        wrapper.classList.remove('invalid');
-      }
-    });
- 
     const totals = recalculate();
     const msgEl = document.getElementById('form-msg');
+    let valid = true;
  
     if (!totals.hasItems) {
-      msgEl.textContent = 'Please choose at least one item before submitting your order.';
+      msgEl.textContent = 'Please choose at least one item and quantity before adding to your basket.';
       msgEl.className = 'form-msg error show';
       valid = false;
     }
@@ -700,16 +970,13 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
  
     if (!valid) {
       if (totals.hasItems) {
-        msgEl.textContent = colorsValid
-          ? 'Please fill in your name, phone number and delivery address.'
-          : 'Please fill in the required details for each item, and fill in your name, phone number and delivery address.';
+        msgEl.textContent = 'Please fill in the required details for each item before adding to your basket.';
         msgEl.className = 'form-msg error show';
       }
       return;
     }
-    msgEl.className = 'form-msg';
  
-    const orderedItems = [];
+    const newItems = [];
     itemsEl.querySelectorAll('.order-item-card').forEach(card => {
       const idx = parseInt(card.getAttribute('data-index'), 10);
       const qty = parseInt(card.querySelector('[data-role="qty"]').value, 10) || 0;
@@ -755,7 +1022,8 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
           sel = { customizations };
           lineTotal = product.price * qty;
         }
-        orderedItems.push({
+        newItems.push({
+          category: pageKey,
           name: product.name,
           unit: product.unit,
           price: product.price,
@@ -766,10 +1034,125 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
         });
       }
     });
+
+    addItemsToBasket(newItems);
+
+    const addedCount = newItems.reduce((sum, it) => sum + it.qty, 0);
+    msgEl.innerHTML = `Added ${addedCount} item${addedCount === 1 ? '' : 's'} to your basket. <a href="basket.html">View Basket &rarr;</a>`;
+    msgEl.className = 'form-msg success show';
+
+    // reset the form back to zero so the customer can add a different item next
+    itemsEl.querySelectorAll('[data-role="qty"]').forEach(input => { input.value = 0; });
+    recalculate();
+  });
+}
  
+/* ---------------- basket page ---------------- */
+function renderBasketLines(symbol) {
+  const listEl = document.querySelector('[data-list="basket-items"]');
+  const emptyEl = document.getElementById('basket-empty');
+  const checkoutBlocks = document.querySelectorAll('[data-role="checkout-block"]');
+  const items = getBasket();
+
+  if (!listEl) return { items, subtotal: 0 };
+
+  if (!items.length) {
+    listEl.innerHTML = '';
+    if (emptyEl) emptyEl.style.display = '';
+    checkoutBlocks.forEach(el => el.style.display = 'none');
+    return { items, subtotal: 0 };
+  }
+
+  if (emptyEl) emptyEl.style.display = 'none';
+  checkoutBlocks.forEach(el => el.style.display = '');
+
+  listEl.innerHTML = items.map(it => `
+    <div class="basket-line" data-id="${it.id}">
+      <div class="basket-line-main">
+        <span class="basket-line-cat">${escapeHtml(categoryLabel(it.category))}</span>
+        <span class="basket-line-name">${it.qty} &times; ${escapeHtml(it.name)}</span>
+        ${(!it.letters && it.colorLine) ? it.colorLine.split('\n').map(line => `<div class="basket-line-sub">* ${escapeHtml(line)}</div>`).join('') : ''}
+        ${it.letters && it.letters.length ? buildLetterPreviewsHtml(it.letters, symbol) : ''}
+      </div>
+      <div class="basket-line-price">${formatMoney(it.lineTotal, symbol)}</div>
+      <button type="button" class="basket-remove-btn" data-action="remove-basket-item" data-id="${it.id}" aria-label="Remove ${escapeHtml(it.name)} from basket">&times;</button>
+    </div>
+  `).join('');
+
+  const subtotal = items.reduce((sum, it) => sum + it.lineTotal, 0);
+  return { items, subtotal };
+}
+
+function initBasketPage(site, basketConf) {
+  const symbol = site.currencySymbol || '$';
+  const deliveryFee = (basketConf && basketConf.deliveryFee) || 0;
+  const listEl = document.querySelector('[data-list="basket-items"]');
+  if (!listEl) return;
+
+  function recalc() {
+    const { items, subtotal } = renderBasketLines(symbol);
+    const hasItems = items.length > 0;
+    const total = hasItems ? subtotal + deliveryFee : 0;
+    document.querySelectorAll('[data-role="delivery-fee"]').forEach(el => el.textContent = formatMoney(deliveryFee, symbol));
+    document.querySelectorAll('[data-role="subtotal"]').forEach(el => el.textContent = formatMoney(subtotal, symbol));
+    document.querySelectorAll('[data-role="grand-total"]').forEach(el => el.textContent = formatMoney(total, symbol));
+    return { items, subtotal, deliveryFee, total, hasItems };
+  }
+
+  listEl.addEventListener('click', e => {
+    const btn = e.target.closest('[data-action="remove-basket-item"]');
+    if (!btn) return;
+    removeBasketItem(btn.getAttribute('data-id'));
+    recalc();
+  });
+
+  recalc();
+
+  const form = document.getElementById('checkout-form');
+  if (!form) return;
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+
+    const nameField = document.getElementById('cust-name');
+    const phoneField = document.getElementById('cust-phone');
+    const addressField = document.getElementById('cust-address');
+    const emailField = document.getElementById('cust-email');
+    const notesField = document.getElementById('cust-notes');
+    const fields = [nameField, phoneField, addressField];
+    let valid = true;
+
+    fields.forEach(f => {
+      const wrapper = f.closest('.form-field');
+      if (!f.value.trim()) {
+        wrapper.classList.add('invalid');
+        valid = false;
+      } else {
+        wrapper.classList.remove('invalid');
+      }
+    });
+
+    const totals = recalc();
+    const msgEl = document.getElementById('form-msg');
+
+    if (!totals.hasItems) {
+      msgEl.textContent = 'Your basket is empty. Add a few items before placing your order.';
+      msgEl.className = 'form-msg error show';
+      valid = false;
+    }
+
+    if (!valid) {
+      if (totals.hasItems) {
+        msgEl.textContent = 'Please fill in your name, phone number and delivery address.';
+        msgEl.className = 'form-msg error show';
+      }
+      return;
+    }
+    msgEl.className = 'form-msg';
+
     const orderId = 'ORD-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '-' + Date.now().toString().slice(-4);
     const orderDate = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
- 
+
     const customer = {
       name: nameField.value.trim(),
       phone: phoneField.value.trim(),
@@ -777,12 +1160,16 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
       email: emailField ? emailField.value.trim() : '',
       notes: notesField ? notesField.value.trim() : ''
     };
- 
-    sendOrderEmails(pageData, site, orderId, orderDate, customer, orderedItems, totals);
-    showReceipt(pageData, site, orderId, orderDate, customer, orderedItems, totals);
+
+    const orderedItems = totals.items;
+
+    sendOrderEmails(null, site, orderId, orderDate, customer, orderedItems, totals);
+    showReceipt(null, site, orderId, orderDate, customer, orderedItems, totals);
+
+    clearBasket();
   });
 }
- 
+
 function buildReceiptPdf(site, orderId, orderDate, customer, items, totals) {
   if (!window.jspdf) return null;
   const { jsPDF } = window.jspdf;
@@ -1117,6 +1504,13 @@ function showReceipt(pageData, site, orderId, orderDate, customer, items, totals
 /* ---------------- boot ---------------- */
 document.addEventListener('DOMContentLoaded', () => {
   initMobileNav();
+  initNavIcons();
+  updateBasketBadge();
+  updateFavoritesBadge();
+  window.addEventListener('storage', e => {
+    if (e.key === BASKET_KEY) updateBasketBadge();
+    if (e.key === FAVORITES_KEY) updateFavoritesBadge();
+  });
   fetch('content.json')
     .then(res => res.json())
     .then(data => {
@@ -1131,6 +1525,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (data.trust) renderTrust(data.trust);
       if (data.categories) renderCategories(data.categories);
       if (data.products) renderProducts(data.products, data.categories);
+      initSearchAutocomplete(data.products);
       if (data.footer) {
         renderFooterColumns(data.footer.columns);
         renderLegalLinks(data.footer.legalLinks);
@@ -1160,14 +1555,34 @@ document.addEventListener('DOMContentLoaded', () => {
         bindText(document, { order: data.orderPages.letter });
         renderOrderPage('letter', data.orderPages.letter, data.site, data.colorOptions);
       }
+      if (page === 'basket' && data.basketPage) {
+        document.title = data.basketPage.pageTitle;
+        bindText(document, { basket: data.basketPage });
+        initBasketPage(data.site, data.basketPage);
+      }
+      if (page === 'favorites' && data.favoritesPage) {
+        document.title = data.favoritesPage.pageTitle;
+        bindText(document, { favorites: data.favoritesPage });
+        renderFavoritesPage(data.products, data.categories);
+      }
+      if (page === 'shop' && data.shopPage) {
+        document.title = data.shopPage.pageTitle;
+        bindText(document, { shop: data.shopPage });
+        initShopFilters(data.categories);
+
+        const q = new URLSearchParams(window.location.search).get('q');
+        if (q) {
+          const input = document.getElementById('searchInput');
+          const wrap = document.getElementById('searchWrap');
+          const toggle = document.getElementById('searchToggle');
+          if (input) input.value = q;
+          if (wrap) wrap.classList.add('open');
+          if (toggle) toggle.setAttribute('aria-expanded', 'true');
+          filterProducts(q);
+        }
+      }
       if (page === '404') {
         document.title = `Page Not Found | ${data.site.brandName}`;
-      }
- 
-      if (document.getElementById('slides')) {
-        renderSlide();
-        resetAutoplay();
-        initHeroAutoplayPause();
       }
     })
     .catch(err => {

@@ -17,7 +17,7 @@
     "links": [
       {
         "label": "Shop",
-        "href": "index.html#shop"
+        "href": "shop.html"
       },
       {
         "label": "Crochet",
@@ -64,6 +64,13 @@
       }
     ]
   },
+  "announcement": {
+    "items": [
+      "Handmade to order, always with love",
+      "Cash on Delivery across Qatar",
+      "Custom colors on every piece"
+    ]
+  },
   "trust": [
     {
       "title": "Handmade",
@@ -105,7 +112,36 @@
   ],
   "productsSection": {
     "eyebrow": "From the Shop",
-    "heading": "Currently Available"
+    "heading": "Currently Available",
+    "viewAllText": "View All",
+    "viewAllHref": "shop.html"
+  },
+  "ritual": {
+    "eyebrow": "The Craft",
+    "heading": "Made slowly, on purpose.",
+    "body": "Every piece starts as a ball of yarn, a spool of ribbon or a blank sheet of paper, and is shaped by hand, one stitch or fold at a time. Simple materials, an unhurried process, made to be kept.",
+    "ctaText": "Shop the Collection",
+    "ctaHref": "shop.html",
+    "image": "assets/images/heart_crochet_red.webp",
+    "imageAlt": "Handmade red and cream crochet heart keychain with a bow"
+  },
+  "promiseSection": {
+    "eyebrow": "Our Promise",
+    "heading": "Small batch, made with care",
+    "items": [
+      {
+        "title": "Handmade",
+        "text": "Every piece made by hand to order"
+      },
+      {
+        "title": "Custom Colors",
+        "text": "Choose your own yarn and ribbon colors"
+      },
+      {
+        "title": "Cash on Delivery",
+        "text": "Pay only when your order arrives"
+      }
+    ]
   },
   "products": [
     {
@@ -224,47 +260,72 @@
     "crochet": {
       "pageTitle": "Order Crochet Items | Aurelis",
       "heading": "Order Crochet Items",
-      "intro": "Choose your items and quantities below, then add your delivery details. Payment is cash on delivery. We will confirm your order and an estimated delivery date by phone before it ships.",
-      "deliveryFee": 0,
+      "intro": "Choose your items, quantities and colors below, then add them to your basket. You can keep shopping and check out everything together.",
+      "addToBasketText": "Add to Basket",
       "products": [
         {
           "name": "Butterfly",
           "unit": "each",
-          "price": 15
+          "price": 15,
+          "image": "assets/images/butterfly_crochet.webp",
+          "imageAlt": "Butterfly"
         },
         {
           "name": "Heart w/ Ribbon",
           "unit": "each",
-          "price": 12
+          "price": 12,
+          "image": "assets/images/heart_crochet_pink.webp",
+          "imageAlt": "Heart with Ribbon"
         }
       ]
     },
     "ribbon": {
       "pageTitle": "Order Ribbon | Aurelis",
       "heading": "Order Ribbon",
-      "intro": "Choose your ribbon type and the number of yards, then add your delivery details. Payment is cash on delivery. We will confirm your order and an estimated delivery date by phone before it ships.",
-      "deliveryFee": 0,
+      "intro": "Choose your ribbon type, colors and quantity below, then add it to your basket. You can keep shopping and check out everything together.",
+      "addToBasketText": "Add to Basket",
       "products": [
         {
           "name": "Mini Bouquet Keychain",
           "unit": "each",
-          "price": 15
+          "price": 15,
+          "image": "assets/images/mini_bouquet_samples.webp",
+          "imageAlt": "Mini Bouquet Keychain"
         }
       ]
     },
     "letter": {
       "pageTitle": "Order a Letter | Aurelis",
       "heading": "Order a Letter",
-      "intro": "Pick a border design and write your letter below — we'll handwrite it onto that design for you. Then add your delivery details. Payment is cash on delivery. We will confirm your order and an estimated delivery date by phone before it ships.",
-      "deliveryFee": 0,
+      "intro": "Pick a border design and write your letter below \u2014 we'll handwrite it onto that design for you. Then add it to your basket. You can keep shopping and check out everything together.",
+      "addToBasketText": "Add to Basket",
       "products": [
         {
           "name": "Handwritten Letter",
           "unit": "each",
-          "price": 20
+          "price": 20,
+          "image": "images/product-letter.jpg",
+          "imageAlt": "Handwritten Letter with decorative border"
         }
       ]
     }
+  },
+  "favoritesPage": {
+    "pageTitle": "Your Favorites | Aurelis",
+    "heading": "Your Favorites",
+    "intro": "Everything you've saved with the heart icon, in one place. Favorites are saved on this device so they'll still be here next time you visit.",
+    "emptyHeading": "No favorites yet",
+    "emptyText": "Tap the heart on any product to save it here for later.",
+    "continueShoppingText": "Browse the Shop"
+  },
+  "basketPage": {
+    "pageTitle": "Your Basket | Aurelis",
+    "heading": "Your Basket",
+    "intro": "Review what you've added below, fill in your delivery details, and place your order. Payment is cash on delivery \u2014 we will confirm your order and an estimated delivery date by phone before it ships.",
+    "emptyHeading": "Your basket is empty",
+    "emptyText": "Browse the shop and add a few handmade pieces to get started.",
+    "continueShoppingText": "Continue Shopping",
+    "deliveryFee": 0
   },
   "footer": {
     "columns": [
@@ -434,5 +495,10 @@
         }
       ]
     }
+  },
+  "shopPage": {
+    "pageTitle": "Shop All | Aurelis",
+    "heading": "Shop All",
+    "intro": "Every handmade piece we currently offer, in one place. Pick a category below to customize colors, sizes, and add it to your basket."
   }
 }

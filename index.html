@@ -22,6 +22,14 @@
 </head>
 <body data-page="home">
 
+<div class="announce-bar">
+  <div class="wrap announce-row">
+    <span data-bind="announcement.items.0"></span>
+    <span data-bind="announcement.items.1"></span>
+    <span data-bind="announcement.items.2"></span>
+  </div>
+</div>
+
 <header>
   <div class="nav-row">
     <div class="logo">
@@ -29,100 +37,125 @@
       <span data-bind="site.brandName"></span>
     </div>
     <nav class="links" data-list="nav-links"></nav>
+    <div class="nav-icons">
+      <div class="search-wrap" id="searchWrap">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search products…" aria-label="Search products">
+        <button type="button" class="icon-btn" id="searchToggle" aria-label="Search products" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        </button>
+      </div>
+      <a class="icon-btn" href="mailto:aurelis2058@gmail.com" aria-label="Order enquiries">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-6.5 8-6.5s8 2.1 8 6.5"/></svg>
+      </a>
+      <a class="icon-btn" href="shop.html" aria-label="Go to shop">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6.5 8h11l-1 12.5h-9L6.5 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+      </a>
+      <a class="icon-btn" href="favorites.html" aria-label="View favorites">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 20.5s-7.5-4.6-10-9.3C.4 8 1.6 4.3 5 3.2c2.3-.7 4.5.2 6 2.2 1.5-2 3.7-2.9 6-2.2 3.4 1.1 4.6 4.8 3 8-2.5 4.7-10 9.3-10 9.3z"/></svg>
+        <span class="basket-count" data-role="favorites-count">0</span>
+      </a>
+      <a class="icon-btn" href="basket.html" aria-label="View basket">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/><path d="M2.5 3h2l2.6 12.4a2 2 0 002 1.6h8.4a2 2 0 002-1.6L21 8H6"/></svg>
+        <span class="basket-count" data-role="basket-count">0</span>
+      </a>
+    </div>
     <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </div>
 </header>
 
-<!-- ===================== HERO CAROUSEL ===================== -->
-<div class="hero">
-  <div class="slides" id="slides">
-
-    <div class="slide slide1">
-      <div class="wrap">
-        <div class="slide-text">
-          <span class="eyebrow" data-bind="hero.slides.0.eyebrow"></span>
-          <h1 data-bind="hero.slides.0.heading"></h1>
-          <p data-bind="hero.slides.0.body"></p>
-          <a class="btn" data-bind="hero.slides.0.ctaText" data-bind-href="hero.slides.0.ctaHref"></a>
-        </div>
-        <div class="hero-art">
-          <img data-bind-src="hero.slides.0.image" data-bind-alt="hero.slides.0.imageAlt" alt="">
-        </div>
-      </div>
+<!-- ===================== HERO (static) ===================== -->
+<div class="hero slide1">
+  <div class="wrap">
+    <div class="slide-text">
+      <span class="eyebrow" data-bind="hero.slides.0.eyebrow"></span>
+      <h1 data-bind="hero.slides.0.heading"></h1>
+      <p data-bind="hero.slides.0.body"></p>
+      <a class="btn" data-bind="hero.slides.0.ctaText" data-bind-href="hero.slides.0.ctaHref"></a>
     </div>
-
-    <div class="slide slide2">
-      <div class="wrap">
-        <div class="slide-text">
-          <span class="eyebrow" data-bind="hero.slides.1.eyebrow"></span>
-          <h1 data-bind="hero.slides.1.heading"></h1>
-          <p data-bind="hero.slides.1.body"></p>
-          <a class="btn outline" data-bind="hero.slides.1.ctaText" data-bind-href="hero.slides.1.ctaHref"></a>
-        </div>
-        <div class="hero-art">
-          <img data-bind-src="hero.slides.1.image" data-bind-alt="hero.slides.1.imageAlt" alt="">
-        </div>
-      </div>
+    <div class="hero-art">
+      <img data-bind-src="hero.slides.0.image" data-bind-alt="hero.slides.0.imageAlt" alt="">
     </div>
-
-    <div class="slide slide3">
-      <div class="wrap">
-        <div class="slide-text">
-          <span class="eyebrow" data-bind="hero.slides.2.eyebrow"></span>
-          <h1 data-bind="hero.slides.2.heading"></h1>
-          <p data-bind="hero.slides.2.body"></p>
-          <a class="btn" data-bind="hero.slides.2.ctaText" data-bind-href="hero.slides.2.ctaHref"></a>
-        </div>
-        <div class="hero-art">
-          <img data-bind-src="hero.slides.2.image" data-bind-alt="hero.slides.2.imageAlt" alt="">
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <button type="button" class="hero-nav-btn prev" onclick="moveSlide(-1)" aria-label="Previous slide">
-    <svg viewBox="0 0 24 24" fill="none" stroke="#2D3A47" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-  </button>
-  <button type="button" class="hero-nav-btn next" onclick="moveSlide(1)" aria-label="Next slide">
-    <svg viewBox="0 0 24 24" fill="none" stroke="#2D3A47" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
-  </button>
-
-  <div class="dots">
-    <button type="button" class="dot active" onclick="goToSlide(0)" aria-label="Show slide 1"><svg viewBox="0 0 26 14" aria-hidden="true"><path d="M13 12C4 12 2 2 8 2c4 0 5 4 5 4s1-4 5-4c6 0 4 10-5 10Z" fill="#B46A72"/></svg></button>
-    <button type="button" class="dot" onclick="goToSlide(1)" aria-label="Show slide 2"><svg viewBox="0 0 26 14" aria-hidden="true"><path d="M13 12C4 12 2 2 8 2c4 0 5 4 5 4s1-4 5-4c6 0 4 10-5 10Z" fill="#B46A72"/></svg></button>
-    <button type="button" class="dot" onclick="goToSlide(2)" aria-label="Show slide 3"><svg viewBox="0 0 26 14" aria-hidden="true"><path d="M13 12C4 12 2 2 8 2c4 0 5 4 5 4s1-4 5-4c6 0 4 10-5 10Z" fill="#B46A72"/></svg></button>
   </div>
 </div>
+
+<!-- ===================== CATEGORIES (floating over hero) ===================== -->
+<section class="categories" id="shop">
+  <div class="wrap">
+    <div class="cat-float-card">
+      <div class="sec-head cat-sec-head">
+        <span class="eyebrow" data-bind="categoriesSection.eyebrow"></span>
+        <h2 data-bind="categoriesSection.heading"></h2>
+      </div>
+      <div class="cat-grid" data-list="categories"></div>
+    </div>
+  </div>
+</section>
 
 <!-- ===================== TRUST STRIP ===================== -->
 <div class="trust">
   <div class="wrap" data-list="trust"></div>
 </div>
 
-<!-- ===================== CATEGORIES ===================== -->
-<section class="categories" id="shop">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow" data-bind="categoriesSection.eyebrow"></span>
-      <h2 data-bind="categoriesSection.heading"></h2>
-      <svg class="ribbon-underline" viewBox="0 0 150 14"><path d="M2 8c15 -12 30 8 40 -2s25 -10 35 0 25 8 35 -2 25 6 35 -2"/></svg>
-    </div>
-    <div class="cat-grid" data-list="categories"></div>
-  </div>
-</section>
-
 <!-- ===================== PRODUCTS ===================== -->
 <section class="products" id="crochet">
   <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow" data-bind="productsSection.eyebrow"></span>
-      <h2 data-bind="productsSection.heading"></h2>
-      <svg class="ribbon-underline" viewBox="0 0 150 14"><path d="M2 8c15 -12 30 8 40 -2s25 -10 35 0 25 8 35 -2 25 6 35 -2"/></svg>
+    <div class="sec-head sec-head-row">
+      <div>
+        <span class="eyebrow" data-bind="productsSection.eyebrow"></span>
+        <h2 data-bind="productsSection.heading"></h2>
+      </div>
+      <a class="view-all" data-bind="productsSection.viewAllText" data-bind-href="productsSection.viewAllHref"></a>
     </div>
     <div class="product-grid" data-list="products"></div>
+  </div>
+</section>
+
+<!-- ===================== THE RITUAL / OUR PROMISE ===================== -->
+<section class="promo" id="about">
+  <div class="wrap">
+    <div class="promo-text">
+      <span class="eyebrow" data-bind="ritual.eyebrow"></span>
+      <h2 data-bind="ritual.heading"></h2>
+      <p data-bind="ritual.body"></p>
+      <a class="btn outline" data-bind="ritual.ctaText" data-bind-href="ritual.ctaHref"></a>
+    </div>
+    <div class="promo-art">
+      <img data-bind-src="ritual.image" data-bind-alt="ritual.imageAlt" alt="">
+    </div>
+  </div>
+</section>
+
+<section class="promise">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow" data-bind="promiseSection.eyebrow"></span>
+      <h2 data-bind="promiseSection.heading"></h2>
+    </div>
+    <div class="promise-grid">
+      <div class="promise-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+        <div>
+          <strong data-bind="promiseSection.items.0.title"></strong>
+          <span data-bind="promiseSection.items.0.text"></span>
+        </div>
+      </div>
+      <div class="promise-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+        <div>
+          <strong data-bind="promiseSection.items.1.title"></strong>
+          <span data-bind="promiseSection.items.1.text"></span>
+        </div>
+      </div>
+      <div class="promise-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+        <div>
+          <strong data-bind="promiseSection.items.2.title"></strong>
+          <span data-bind="promiseSection.items.2.text"></span>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
