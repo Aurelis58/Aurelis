@@ -297,7 +297,7 @@
     "letter": {
       "pageTitle": "Order a Letter | Aurelis",
       "heading": "Order a Letter",
-      "intro": "Pick a border design and write your letter below \u2014 we'll handwrite it onto that design for you. Then add it to your basket. You can keep shopping and check out everything together.",
+      "intro": "Pick a border design and write your letter below — we'll handwrite it onto that design for you. Then add it to your basket. You can keep shopping and check out everything together.",
       "addToBasketText": "Add to Basket",
       "products": [
         {
@@ -321,7 +321,7 @@
   "basketPage": {
     "pageTitle": "Your Basket | Aurelis",
     "heading": "Your Basket",
-    "intro": "Review what you've added below, fill in your delivery details, and place your order. Payment is cash on delivery \u2014 we will confirm your order and an estimated delivery date by phone before it ships.",
+    "intro": "Review what you've added below, fill in your delivery details, and place your order. Payment is cash on delivery — we will confirm your order and an estimated delivery date by phone before it ships.",
     "emptyHeading": "Your basket is empty",
     "emptyText": "Browse the shop and add a few handmade pieces to get started.",
     "continueShoppingText": "Continue Shopping",
@@ -393,6 +393,10 @@
       {
         "label": "Terms and Conditions",
         "href": "terms-and-conditions.html"
+      },
+      {
+        "label": "Cookie Policy",
+        "href": "cookie-policy.html"
       }
     ]
   },
@@ -416,7 +420,7 @@
         },
         {
           "heading": "Cookies and Website Analytics",
-          "body": "This website does not currently use cookies, and we do not run any analytics or advertising tracking on it. Loading this site does make a request to Google Fonts to display our website fonts, which may share your device's IP address with Google as part of that request. If we introduce cookies or analytics tools in the future, we will update this policy and, where required, ask for your consent first."
+          "body": "This website does not use tracking cookies, and we do not run any analytics or advertising tracking on it. We do use your browser's local storage — which is not a cookie — to remember your basket, your favorites, and any order you're partway through filling in, purely so that progress isn't lost if you navigate away. This data stays on your own device and is never sent to us or to anyone else. Loading this site also makes a request to Google Fonts to display our website fonts, which may share your device's IP address with Google as part of that request. See our Cookie Policy for full details. If we introduce tracking cookies or analytics tools in the future, we will update this policy and, where required, ask for your consent first."
         },
         {
           "heading": "Sharing Your Information",
@@ -494,11 +498,56 @@
           "body": "If you have questions about these terms, please contact us at aurelis2058@gmail.com."
         }
       ]
+    },
+    "cookiePolicy": {
+      "title": "Cookie Policy | Aurelis",
+      "heading": "Cookie Policy",
+      "effectiveDate": "Effective date: September 13, 2026",
+      "sections": [
+        {
+          "heading": "Overview",
+          "body": "This page explains how Aurelis uses your browser's storage to make shopping on this site more convenient. It should be read alongside our Privacy Policy, which covers the personal information you give us when you place an order."
+        },
+        {
+          "heading": "We Use Local Storage, Not Tracking Cookies",
+          "body": "This website does not set tracking cookies and does not use any advertising or analytics service. Instead, a few small pieces of data are saved in your browser's built-in “local storage,” a feature that keeps information only on your own device. Nothing in local storage is ever transmitted to our servers or to any third party — it exists purely so the site can remember things for you between page visits."
+        },
+        {
+          "heading": "What We Store and Why",
+          "body": "We use local storage for four purposes only: (1) remembering the items in your shopping basket so it survives closing the tab or coming back later; (2) remembering products you've saved with the heart icon on our Favorites page; (3) saving your progress on an order form — quantities, colors, and any letter details you've started — in case you leave the page to keep browsing and come back to finish it; and (4) remembering that you've seen this notice, so it doesn't show again on your next visit."
+        },
+        {
+          "heading": "No Third-Party Sharing or Tracking",
+          "body": "We do not use this data to track you across other websites, build an advertising profile, or share it with any third party. Loading this site does make a request to Google Fonts to display our website fonts, which may share your device's IP address with Google as part of that request; this is a technical requirement of the fonts we use, not tracking we control."
+        },
+        {
+          "heading": "Managing or Clearing This Data",
+          "body": "Because this data lives only in your browser, you're always in control of it. You can clear your basket, favorites, or a saved order draft at any time by removing the item(s) in question, or clear everything at once through your browser's “clear site data” or “clear browsing data” setting. Clearing this data will empty your basket, your favorites, and any in-progress order draft."
+        },
+        {
+          "heading": "Your Consent",
+          "body": "When you first visit this site, a short notice lets you know that we use local storage as described above. Because this storage is required for core features like the basket, favorites, and order drafts to work, dismissing the notice simply confirms you've seen it — it does not turn these features on or off. If we ever add optional cookies, such as for analytics or advertising, we will update this notice to ask for your consent to those specifically before using them."
+        },
+        {
+          "heading": "Changes to This Policy",
+          "body": "We may update this policy from time to time. Any changes will be posted on this page with a new effective date."
+        },
+        {
+          "heading": "Contact Us",
+          "body": "If you have questions about this policy, please contact us at aurelis2058@gmail.com."
+        }
+      ]
     }
   },
   "shopPage": {
     "pageTitle": "Shop All | Aurelis",
     "heading": "Shop All",
     "intro": "Every handmade piece we currently offer, in one place. Pick a category below to customize colors, sizes, and add it to your basket."
+  },
+  "cookieBanner": {
+    "message": "We use your browser's local storage to remember your basket, favorites, and any order you're partway through — no tracking cookies, nothing sent to anyone else.",
+    "acceptText": "Got it",
+    "learnMoreText": "Cookie Policy",
+    "learnMoreHref": "cookie-policy.html"
   }
 }

@@ -63,6 +63,32 @@ function clearBasket() {
   saveBasket([]);
 }
 
+/* ---------------- cookie / local-storage consent notice ---------------- */
+const COOKIE_CONSENT_KEY = 'aurelis_cookie_consent_v1';
+
+function initCookieBanner(copy) {
+  try {
+    if (localStorage.getItem(COOKIE_CONSENT_KEY)) return;
+  } catch (e) {
+    return; // storage unavailable — nothing to notify about
+  }
+
+  const bar = document.createElement('div');
+  bar.className = 'cookie-banner';
+  bar.setAttribute('role', 'dialog');
+  bar.setAttribute('aria-label', 'Local storage notice');
+  bar.innerHTML = `
+    <p>${escapeHtml(copy.message)} <a href="${copy.learnMoreHref}">${escapeHtml(copy.learnMoreText)}</a></p>
+    <button type="button" class="btn cookie-banner-accept">${escapeHtml(copy.acceptText)}</button>
+  `;
+  document.body.appendChild(bar);
+
+  bar.querySelector('.cookie-banner-accept').addEventListener('click', () => {
+    try { localStorage.setItem(COOKIE_CONSENT_KEY, 'seen'); } catch (e) {}
+    bar.remove();
+  });
+}
+
 function updateBasketBadge() {
   const count = getBasket().reduce((sum, it) => sum + (it.qty || 1), 0);
   document.querySelectorAll('[data-role="basket-count"]').forEach(el => {
@@ -221,7 +247,7 @@ function buildProductCardHtml(p, categories) {
         <h3>${p.name}</h3>
         <div class="price-row">
           <span class="price">${p.price}</span>
-          <a class="add-btn" href="${hrefForCategoryIn(categories, p.category)}" aria-label="Order ${p.name}">
+          <a class="add-btn" href="${hrefForCategoryIn(categories, p.category)}?add=${encodeURIComponent(p.name)}" aria-label="Order ${escapeHtml(p.name)}">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
           </a>
         </div>
@@ -779,6 +805,122 @@ function formatColorLine(pageKey, sel) {
   return '';
 }
 
+function normalizeItemName(s) {
+  return (s || '')
+    .toLowerCase()
+    .replace(/\bw\//g, 'with')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function getDraftKey(pageKey) {
+  return `aurelis_draft_${pageKey}_v1`;
+}
+
+function saveOrderDraft(pageKey, itemsEl) {
+  try {
+    const draft = [];
+    itemsEl.querySelectorAll('.order-item-card').forEach(card => {
+      const index = parseInt(card.getAttribute('data-index'), 10);
+      const qtyInput = card.querySelector('[data-role="qty"]');
+      const qty = parseInt(qtyInput ? qtyInput.value : 0, 10) || 0;
+      const entry = { index, qty };
+
+      const letterEntries = card.querySelectorAll('[data-role="letter-entry"]');
+      if (letterEntries.length) {
+        entry.letters = Array.from(letterEntries).map(entryEl => {
+          const border = entryEl.querySelector('[data-role="border-field"] input[type="radio"]:checked');
+          const size = entryEl.querySelector('[data-role="size-field"] input[type="radio"]:checked');
+          return {
+            border: border ? border.value : '',
+            size: size ? size.value : '',
+            to: (entryEl.querySelector('[data-role="letter-to"]') || {}).value || '',
+            from: (entryEl.querySelector('[data-role="letter-from"]') || {}).value || '',
+            message: (entryEl.querySelector('[data-role="letter-message"]') || {}).value || ''
+          };
+        });
+      }
+
+      const customEntries = card.querySelectorAll('[data-role="customization-entry"]');
+      if (customEntries.length) {
+        entry.customizations = Array.from(customEntries).map(entryEl => ({
+          color1: (entryEl.querySelector('[data-role="color1"]') || {}).value || '',
+          color2: (entryEl.querySelector('[data-role="color2"]') || {}).value || '',
+          wrapper: (entryEl.querySelector('[data-role="wrapper"]') || {}).value || ''
+        }));
+      }
+
+      draft.push(entry);
+    });
+
+    if (draft.some(d => d.qty > 0)) {
+      localStorage.setItem(getDraftKey(pageKey), JSON.stringify(draft));
+    } else {
+      localStorage.removeItem(getDraftKey(pageKey));
+    }
+  } catch (e) {
+    console.error('Could not save order draft', e);
+  }
+}
+
+function restoreOrderDraft(pageKey, itemsEl, colorConf, symbol) {
+  let draft;
+  try {
+    const raw = localStorage.getItem(getDraftKey(pageKey));
+    draft = raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    draft = null;
+  }
+  if (!draft || !Array.isArray(draft) || !draft.length) return;
+
+  draft.forEach(entryData => {
+    const card = itemsEl.querySelector(`.order-item-card[data-index="${entryData.index}"]`);
+    if (!card) return;
+    const qty = entryData.qty || 0;
+    const qtyInput = card.querySelector('[data-role="qty"]');
+    if (qtyInput) qtyInput.value = qty;
+    if (qty <= 0) return;
+
+    if (pageKey === 'letter' && colorConf) {
+      syncLetterEntries(card, qty, colorConf.borderDesigns, colorConf.sizes, symbol);
+      const entries = card.querySelectorAll('[data-role="letter-entry"]');
+      (entryData.letters || []).forEach((letterData, i) => {
+        const entryEl = entries[i];
+        if (!entryEl) return;
+        if (letterData.border) {
+          const radio = entryEl.querySelector(`[data-role="border-field"] input[type="radio"][value="${CSS.escape(letterData.border)}"]`);
+          if (radio) radio.checked = true;
+        }
+        if (letterData.size) {
+          const radio = entryEl.querySelector(`[data-role="size-field"] input[type="radio"][value="${CSS.escape(letterData.size)}"]`);
+          if (radio) radio.checked = true;
+        }
+        const toInput = entryEl.querySelector('[data-role="letter-to"]');
+        if (toInput) toInput.value = letterData.to || '';
+        const fromInput = entryEl.querySelector('[data-role="letter-from"]');
+        if (fromInput) fromInput.value = letterData.from || '';
+        const msgInput = entryEl.querySelector('[data-role="letter-message"]');
+        if (msgInput) msgInput.value = letterData.message || '';
+      });
+    } else if (colorConf) {
+      const nameEl = card.querySelector('.order-item-name');
+      syncCustomizationEntries(card, qty, pageKey, colorConf, nameEl ? nameEl.textContent : '');
+      const entries = card.querySelectorAll('[data-role="customization-entry"]');
+      (entryData.customizations || []).forEach((custData, i) => {
+        const entryEl = entries[i];
+        if (!entryEl) return;
+        const color1 = entryEl.querySelector('[data-role="color1"]');
+        if (color1 && custData.color1) color1.value = custData.color1;
+        refreshSecondColor(entryEl, colorConf);
+        const color2 = entryEl.querySelector('[data-role="color2"]');
+        if (color2 && custData.color2) color2.value = custData.color2;
+        const wrapper = entryEl.querySelector('[data-role="wrapper"]');
+        if (wrapper && custData.wrapper) wrapper.value = custData.wrapper;
+      });
+    }
+  });
+}
+
 function renderOrderPage(pageKey, pageData, site, colorOptions) {
   const symbol = site.currencySymbol || '$';
   const itemsEl = document.querySelector('[data-list="order-items"]');
@@ -812,6 +954,8 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
     </div>
   `;
   }).join('');
+
+  restoreOrderDraft(pageKey, itemsEl, colorConf, symbol);
 
   function recalculate() {
     let subtotal = 0;
@@ -847,6 +991,7 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
     const hasItems = subtotal > 0;
  
     document.querySelectorAll('[data-role="subtotal"]').forEach(el => el.textContent = formatMoney(subtotal, symbol));
+    saveOrderDraft(pageKey, itemsEl);
     return { subtotal, hasItems };
   }
  
@@ -888,6 +1033,27 @@ function renderOrderPage(pageKey, pageData, site, colorOptions) {
   });
  
   recalculate();
+
+  /* deep-link support: a product-grid "add" button can link here as
+     order-crochet.html?add=<name> to pre-fill that item's quantity to 1 */
+  const addParam = new URLSearchParams(window.location.search).get('add');
+  if (addParam) {
+    const wanted = normalizeItemName(addParam);
+    const target = Array.from(itemsEl.querySelectorAll('.order-item-card')).find(card => {
+      const nameEl = card.querySelector('.order-item-name');
+      return nameEl && normalizeItemName(nameEl.textContent) === wanted;
+    });
+    if (target) {
+      const qtyInput = target.querySelector('[data-role="qty"]');
+      if (qtyInput && (parseInt(qtyInput.value, 10) || 0) === 0) {
+        qtyInput.value = 1;
+        recalculate();
+      }
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.classList.add('highlight');
+      setTimeout(() => target.classList.remove('highlight'), 1600);
+    }
+  }
  
   const form = document.getElementById('order-form');
   if (!form) return;
@@ -1530,6 +1696,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderFooterColumns(data.footer.columns);
         renderLegalLinks(data.footer.legalLinks);
       }
+      if (data.cookieBanner) initCookieBanner(data.cookieBanner);
  
       const page = document.body.getAttribute('data-page');
       if (page === 'privacy' && data.legalPages) {
@@ -1539,6 +1706,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (page === 'terms' && data.legalPages) {
         bindText(document, { legal: data.legalPages.termsConditions });
         renderLegalSections(data.legalPages.termsConditions);
+      }
+      if (page === 'cookies' && data.legalPages) {
+        bindText(document, { legal: data.legalPages.cookiePolicy });
+        renderLegalSections(data.legalPages.cookiePolicy);
       }
       if (page === 'order-crochet' && data.orderPages) {
         document.title = data.orderPages.crochet.pageTitle;
