@@ -68,7 +68,7 @@ header{
 }
 .nav-row{
   display:flex; align-items:center; justify-content:space-between;
-  padding:18px 32px;
+  padding:11px 32px;
 }
 .logo{
   font-family:'Parisienne', cursive;
@@ -76,7 +76,11 @@ header{
   color:var(--rosewood-deep);
   display:flex; align-items:center; gap:8px;
 }
-.logo svg{width:30px; height:30px;}
+.logo-img{
+  width:52px; height:52px; flex-shrink:0; object-fit:contain;
+  /* the logo file has a white background; multiply lets the cream header show through */
+  mix-blend-mode:multiply;
+}
 nav.links{display:flex; gap:36px; font-size:14.5px; letter-spacing:0.03em; text-transform:uppercase;}
 nav.links a{position:relative; padding-bottom:4px; transition:color .2s;}
 nav.links a::after{
@@ -643,6 +647,8 @@ footer{background:var(--midnight); border-top:1px solid rgba(255,247,230,0.12); 
   nav.links a::after{display:none;}
   .icon-btn{width:34px; height:34px;}
   .icon-btn svg{width:17px; height:17px;}
+  .nav-row{padding-top:13px; padding-bottom:13px;}
+  .logo-img{width:44px; height:44px;}
   .search-wrap.open .search-input{width:130px;}
 }
 
