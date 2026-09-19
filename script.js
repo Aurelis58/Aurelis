@@ -202,6 +202,17 @@ function renderNav(links) {
     el.innerHTML = links.map(l => `<a href="${l.href}">${l.label}</a>`).join('');
   });
 }
+
+/* highlight the bottom-nav tab for the page being viewed */
+function markActiveNav() {
+  const current = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();
+  document.querySelectorAll('.bottom-nav .bnav-item').forEach(a => {
+    const href = (a.getAttribute('href') || '').split('#')[0].toLowerCase();
+    const active = href === current;
+    a.classList.toggle('active', active);
+    if (active) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  });
+}
  
 function renderTrust(items) {
   const el = document.querySelector('[data-list="trust"]');
@@ -322,34 +333,7 @@ function renderLegalSections(page) {
   `).join('');
 }
  
-/* ---------------- mobile nav ---------------- */
-function initMobileNav() {
-  const toggle = document.getElementById('navToggle');
-  const nav = document.querySelector('nav.links');
-  if (!toggle || !nav) return;
-
-  function closeMenu() {
-    nav.classList.remove('open');
-    toggle.classList.remove('open');
-    toggle.setAttribute('aria-expanded', 'false');
-  }
-
-  toggle.addEventListener('click', () => {
-    const isOpen = nav.classList.toggle('open');
-    toggle.classList.toggle('open', isOpen);
-    toggle.setAttribute('aria-expanded', String(isOpen));
-  });
-
-  nav.addEventListener('click', e => {
-    if (e.target.tagName === 'A') closeMenu();
-  });
-
-  window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) closeMenu();
-  });
-}
-
-/* ---------------- nav icons: search / account / basket ---------------- */
+/* ---------------- top-bar search ---------------- */
 let currentSearchTerm = '';
 let currentCategoryFilter = '';
 
@@ -499,7 +483,20 @@ function initNavIcons() {
   const input = document.getElementById('searchInput');
   if (!toggle || !wrap || !input) return;
 
+  const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+
   toggle.addEventListener('click', () => {
+    /* mobile: the search bar is always visible, so the button submits or focuses it */
+    if (isMobile()) {
+      const term = input.value.trim();
+      if (term && !document.querySelector('.product-grid')) {
+        window.location.href = `shop.html?q=${encodeURIComponent(term)}`;
+      } else {
+        input.focus();
+      }
+      return;
+    }
+    /* desktop: the button expands / collapses the search field */
     const isOpen = wrap.classList.toggle('open');
     toggle.setAttribute('aria-expanded', String(isOpen));
     if (isOpen) {
@@ -1669,7 +1666,7 @@ function showReceipt(pageData, site, orderId, orderDate, customer, items, totals
  
 /* ---------------- boot ---------------- */
 document.addEventListener('DOMContentLoaded', () => {
-  initMobileNav();
+  markActiveNav();
   initNavIcons();
   updateBasketBadge();
   updateFavoritesBadge();
